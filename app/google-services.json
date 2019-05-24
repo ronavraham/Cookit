@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "514562915890",
+    "firebase_url": "https://cookit-abd18.firebaseio.com",
+    "project_id": "cookit-abd18",
+    "storage_bucket": "cookit-abd18.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:514562915890:android:6480ddac81c3ac87",
+        "android_client_info": {
+          "package_name": "com.grd.cookit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "514562915890-9bej2vtacps1gi9p4h2q21bmckmnan56.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA_3CCJcweH72xK_4nDN20whLvtNZl-DkE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "514562915890-9bej2vtacps1gi9p4h2q21bmckmnan56.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
