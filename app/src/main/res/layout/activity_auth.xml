@@ -12,7 +12,9 @@
         android:layout_height="56dp"
         android:background="@color/colorPrimary"
         app:layout_constraintTop_toTopOf="parent"
-        app:titleTextColor="@android:color/white"></android.support.v7.widget.Toolbar>
+        app:titleTextColor="@android:color/white"
+        style="@style/ActionBarStyle">
+    </android.support.v7.widget.Toolbar>
 
     <FrameLayout
         android:id="@+id/auth_content"
