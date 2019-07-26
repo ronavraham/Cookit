@@ -1,16 +1,16 @@
 package com.grd.cookit.activities;
+
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v4.app.FragmentActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
-import com.grd.cookit.R;
-import com.grd.cookit.fragments.AuthFragment;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -25,6 +25,8 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.grd.cookit.R;
+import com.grd.cookit.fragments.AuthFragment;
 
 public class AuthActivity extends AppCompatActivity {
     private final static int RC_SIGN_IN = 1;
@@ -47,8 +49,8 @@ public class AuthActivity extends AppCompatActivity {
 //            e.printStackTrace();
 //        }
 
-        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
-        android.support.v4.app.FragmentTransaction fragmentTransaction =
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction =
                 fragmentManager.beginTransaction();
 
         AuthFragment authFragment = new AuthFragment();
