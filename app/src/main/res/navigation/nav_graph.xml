@@ -10,4 +10,9 @@
         android:name="com.grd.cookit.HomeFragment"
         android:label="fragment_home"
         tools:layout="@layout/fragment_home" />
+    <fragment
+        android:id="@+id/addEditRecipeFragment"
+        android:name="com.grd.cookit.AddEditRecipeFragment"
+        android:label="fragment_add_edit_recipe"
+        tools:layout="@layout/fragment_add_edit_recipe" />
 </navigation>
