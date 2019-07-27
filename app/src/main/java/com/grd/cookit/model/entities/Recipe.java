@@ -3,7 +3,6 @@ package com.grd.cookit.model.entities;
 public class Recipe {
     public String uid;
     public String name;
-    public String description;
     public String imageUri;
     public String userUid;
     public Long timestamp;
@@ -25,14 +24,6 @@ public class Recipe {
         this.uid = uid;
     }
 
-    public String getContent() {
-        return description;
-    }
-
-    public void setContent(String content) {
-        this.description = content;
-    }
-
     public String getImageUri() {
         return imageUri;
     }
@@ -47,5 +38,13 @@ public class Recipe {
 
     public void setUserUid(String userUid) {
         this.userUid = userUid;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }
