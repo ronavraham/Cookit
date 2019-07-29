@@ -8,8 +8,12 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.gms.common.SignInButton;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.grd.cookit.activities.AuthActivity;
 import com.grd.cookit.activities.MapsActivity;
@@ -18,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
 
     private SignInButton signInBtn;
     private Button signOutBtn;
+    private NavController navController;
     private final static String TAG = "MAIN_ACTIVITY";
 
     @Override
@@ -34,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         } else {
             Log.d(TAG, "YAYYY");
+            navController = Navigation.findNavController(this,R.id.nav_host_fragment);
+            NavigationUI.setupActionBarWithNavController(this,navController);
         }
     }
 
