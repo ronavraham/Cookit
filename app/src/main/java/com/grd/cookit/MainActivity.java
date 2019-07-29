@@ -3,6 +3,7 @@ package com.grd.cookit;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import androidx.appcompat.widget.Toolbar;
 import com.google.android.gms.common.SignInButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.grd.cookit.activities.AuthActivity;
+import com.grd.cookit.activities.MapsActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,5 +35,11 @@ public class MainActivity extends AppCompatActivity {
         } else {
             Log.d(TAG, "YAYYY");
         }
+    }
+
+    public void openMaps(View view)
+    {
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
     }
 }
