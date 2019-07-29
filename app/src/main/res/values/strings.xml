@@ -19,4 +19,6 @@
     <string name="take_picture">take picture</string>
     <string name="publish">publish</string>
     <string name="add_recipe_title">add new recipe</string>
+    <string name="take_picture_error">could not take picture</string>
+    <string name="take_picture_permission">camera permission is required</string>
 </resources>

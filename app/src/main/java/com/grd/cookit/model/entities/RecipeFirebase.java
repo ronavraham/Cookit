@@ -2,6 +2,7 @@ package com.grd.cookit.model.entities;
 
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.util.Log;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -15,6 +16,7 @@ import java.io.ByteArrayOutputStream;
 
 public class RecipeFirebase {
     private static RecipeFirebase instance = null;
+    private static final String TAG = "RecipeFirebase";
 
     protected RecipeFirebase() {
     }
@@ -36,17 +38,27 @@ public class RecipeFirebase {
         byte[] data = buffer.toByteArray();
 
         UploadTask uploadTask = imageRef.putBytes(data);
-        uploadTask.addOnSuccessListener(taskSnapshot -> {
-            Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
-            while (!urlTask.isSuccessful()) {
-                Uri downloadUrl = urlTask.getResult();
-                listener.onSuccess(downloadUrl);
+        uploadTask.continueWithTask((task) -> {
+            if (!task.isSuccessful()) {
+                Exception e = task.getException();
+                Log.e(TAG, e.toString());
             }
+            return imageRef.getDownloadUrl();
+        }).addOnSuccessListener((task)-> {
+            listener.onSuccess(task);
         });
+//        uploadTask.addOnSuccessListener(taskSnapshot -> {
+//            Task<Uri> urlTask = taskSnapshot.getStorage().getDownloadUrl();
+//            Uri downloadUrl = urlTask.getResult();
+//            listener.onSuccess(downloadUrl);
+//        });
     }
 
     public static void saveRecipe(Recipe recipe, OnSuccessListener onSuccessListener) {
         DatabaseReference mdatabase = FirebaseDatabase.getInstance().getReference();
-        mdatabase.child("recipes").child(recipe.getUid()).setValue(recipe).addOnSuccessListener(onSuccessListener);
+        mdatabase.child("recipes").child(recipe.getUid()).setValue(recipe).addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener((error) -> {
+                    Log.d(TAG, error.toString());
+                });
     }
 }

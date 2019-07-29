@@ -6,4 +6,6 @@
     <string name="take_picture">צלם תמונה</string>
     <string name="publish">פרסם</string>
     <string name="add_recipe_title">הוסף מתכון חדש</string>
+    <string name="take_picture_error">לא הצלחנו לצלם תמונה</string>
+    <string name="take_picture_permission">צריך הרשאות למצלמה</string>
 </resources>
