@@ -13,6 +13,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 public class RecipeFirebase {
     private static RecipeFirebase instance = null;
@@ -28,16 +29,13 @@ public class RecipeFirebase {
         return instance;
     }
 
-    public static void saveImage(Bitmap image, String uid, final OnSuccessListener<Uri> listener) {
+    public static void saveImage(File image, String uid, final OnSuccessListener<Uri> listener) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
 
         StorageReference imageRef = storage.getReference().child("images").child(uid);
+        Uri fileUri = Uri.fromFile(image);
 
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.JPEG, 100, buffer);
-        byte[] data = buffer.toByteArray();
-
-        UploadTask uploadTask = imageRef.putBytes(data);
+        UploadTask uploadTask = imageRef.putFile(fileUri);
         uploadTask.continueWithTask((task) -> {
             if (!task.isSuccessful()) {
                 Exception e = task.getException();

@@ -12,9 +12,15 @@
         tools:layout="@layout/fragment_home" >
         <action
             android:id="@+id/action_homeFragment_to_addEditRecipeFragment"
-            app:destination="@id/addEditRecipeFragment" >
-            <argument android:defaultValue="add"
-                android:name="type" />
+            app:destination="@id/addEditRecipeFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim"
+            app:popUpTo="@+id/homeFragment">
+            <argument
+                android:name="type"
+                android:defaultValue="add" />
         </action>
     </fragment>
     <fragment
