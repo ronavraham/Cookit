@@ -16,6 +16,9 @@
             <argument android:defaultValue="add"
                 android:name="type" />
         </action>
+        <action
+            android:id="@+id/action_homeFragment_to_mapsFragment"
+            app:destination="@id/mapsFragment" />
     </fragment>
     <fragment
         android:id="@+id/addEditRecipeFragment"
@@ -26,4 +29,9 @@
             android:name="type"
             app:argType="string"/>
     </fragment>
+    <fragment
+        android:id="@+id/mapsFragment"
+        android:name="com.grd.cookit.fragments.MapsFragment"
+        android:label="fragment_maps"
+        tools:layout="@layout/fragment_maps" />
 </navigation>
