@@ -1,18 +1,15 @@
 package com.grd.cookit.model.entities;
 
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 
 public class RecipeFirebase {
@@ -54,7 +51,7 @@ public class RecipeFirebase {
 
     public static void saveRecipe(Recipe recipe, OnSuccessListener onSuccessListener) {
         DatabaseReference mdatabase = FirebaseDatabase.getInstance().getReference();
-        mdatabase.child("recipes").child(recipe.getUid()).setValue(recipe).addOnSuccessListener(onSuccessListener)
+        mdatabase.child("recipes").child(recipe.uid).setValue(recipe).addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener((error) -> {
                     Log.d(TAG, error.toString());
                 });

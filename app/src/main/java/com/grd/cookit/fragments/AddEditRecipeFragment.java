@@ -1,9 +1,9 @@
-package com.grd.cookit;
+package com.grd.cookit.fragments;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -20,12 +20,16 @@ import android.widget.Toast;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
-import androidx.navigation.NavHostController;
 import androidx.navigation.Navigation;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.grd.cookit.R;
 import com.grd.cookit.repositories.RecipeRepository;
 
 import java.io.File;
@@ -40,6 +44,7 @@ public class AddEditRecipeFragment extends Fragment {
     private final int PERMISSION_ALL = 1;
     private static final String TAG = "AddEditRecipeFragment";
     private static final String APP_NAME = "coockit";
+    private final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
 
     private static String[] PERMISSIONS = {
             Manifest.permission.CAMERA,
@@ -51,6 +56,7 @@ public class AddEditRecipeFragment extends Fragment {
     ProgressBar progressBar;
     EditText editText;
     File tempFile;
+    private boolean locationPermissionGranted;
 
 
     public AddEditRecipeFragment() {
@@ -127,11 +133,13 @@ public class AddEditRecipeFragment extends Fragment {
 
     public void publishRecipe() {
         progressBar.setVisibility(View.VISIBLE);
-        RecipeRepository.saveRecipe(editText.getText().toString(), tempFile, (e) -> {
-            progressBar.setVisibility(View.INVISIBLE);
-            Toast.makeText(getActivity(), "succeed", Toast.LENGTH_SHORT).show();
-           NavController navController = Navigation.findNavController(getActivity(),R.id.nav_host_fragment);
-           navController.popBackStack();
+        getPhoneLocation((location) -> {
+            RecipeRepository.saveRecipe(editText.getText().toString(), tempFile, location, (e) -> {
+                progressBar.setVisibility(View.INVISIBLE);
+                Toast.makeText(getActivity(), "succeed", Toast.LENGTH_SHORT).show();
+                NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+                navController.popBackStack();
+            });
         });
     }
 
@@ -191,5 +199,26 @@ public class AddEditRecipeFragment extends Fragment {
             return true;
         }
         return false;
+    }
+
+    private void getPhoneLocation(OnSuccessListener<Location> listener) {
+        getLocationPermission();
+        if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        fusedLocationClient.getLastLocation().addOnSuccessListener(listener);
+    }
+
+    private void getLocationPermission() {
+        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            locationPermissionGranted = true;
+        } else {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
     }
 }

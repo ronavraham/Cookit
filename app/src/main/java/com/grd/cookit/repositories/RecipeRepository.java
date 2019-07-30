@@ -1,5 +1,7 @@
 package com.grd.cookit.repositories;
 
+import android.location.Location;
+
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
@@ -14,18 +16,20 @@ import java.util.concurrent.Executors;
 public class RecipeRepository {
     public static final RecipeRepository instance = new RecipeRepository();
 
-    public static void saveRecipe(String recipeName, File image, OnSuccessListener onSuccessListener) {
-        Tasks.call(Executors.newSingleThreadExecutor(),()->{
-        Recipe recipe = new Recipe();
+    public static void saveRecipe(String recipeName, File image, Location location, OnSuccessListener onSuccessListener) {
+        Tasks.call(Executors.newSingleThreadExecutor(), () -> {
+            Recipe recipe = new Recipe();
             String uid = UUID.randomUUID().toString();
-            recipe.setUid(uid);
-            recipe.setUserUid(FirebaseAuth.getInstance().getCurrentUser().getUid());
-            recipe.setTimestamp(new Date().getTime());
-            recipe.setName(recipeName);
+            recipe.uid = uid;
+            recipe.userUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+            recipe.timestamp = new Date().getTime();
+            recipe.name = recipeName;
+            recipe.longitude = location.getLongitude();
+            recipe.latitude = location.getLatitude();
 
-            RecipeFirebase.saveImage(image,uid,(newImageUrl)->{
-                recipe.setImageUri(newImageUrl.toString());
-                RecipeFirebase.saveRecipe(recipe,onSuccessListener);
+            RecipeFirebase.saveImage(image, uid, (newImageUrl) -> {
+                recipe.imageUri = newImageUrl.toString();
+                RecipeFirebase.saveRecipe(recipe, onSuccessListener);
             });
 
 //            final TaskCompletionSource<Uri> source = new TaskCompletionSource<>();
