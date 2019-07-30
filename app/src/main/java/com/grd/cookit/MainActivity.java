@@ -3,6 +3,7 @@ package com.grd.cookit;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.grd.cookit.activities.AuthActivity;
+import com.grd.cookit.activities.MapsActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,5 +42,11 @@ public class MainActivity extends AppCompatActivity {
             navController = Navigation.findNavController(this,R.id.nav_host_fragment);
             NavigationUI.setupActionBarWithNavController(this,navController);
         }
+    }
+
+    public void openMaps(View view)
+    {
+        Intent intent = new Intent(this, MapsActivity.class);
+        startActivity(intent);
     }
 }
