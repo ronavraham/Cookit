@@ -142,6 +142,9 @@ public class AddEditRecipeFragment extends Fragment {
                 Toast.makeText(getActivity(), "succeed", Toast.LENGTH_SHORT).show();
                 NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
                 navController.popBackStack();
+            },(error)->{
+                progressBar.setVisibility(View.INVISIBLE);
+                Toast.makeText(getActivity(),R.string.general_error_message,Toast.LENGTH_SHORT).show();
             });
         });
     }
