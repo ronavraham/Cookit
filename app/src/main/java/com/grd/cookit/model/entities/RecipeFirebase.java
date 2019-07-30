@@ -1,18 +1,16 @@
 package com.grd.cookit.model.entities;
 
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 
 public class RecipeFirebase {
     private static RecipeFirebase instance = null;
@@ -28,16 +26,13 @@ public class RecipeFirebase {
         return instance;
     }
 
-    public static void saveImage(Bitmap image, String uid, final OnSuccessListener<Uri> listener) {
+    public static void saveImage(File image, String uid, final OnSuccessListener<Uri> listener) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
 
         StorageReference imageRef = storage.getReference().child("images").child(uid);
+        Uri fileUri = Uri.fromFile(image);
 
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.JPEG, 100, buffer);
-        byte[] data = buffer.toByteArray();
-
-        UploadTask uploadTask = imageRef.putBytes(data);
+        UploadTask uploadTask = imageRef.putFile(fileUri);
         uploadTask.continueWithTask((task) -> {
             if (!task.isSuccessful()) {
                 Exception e = task.getException();
@@ -56,7 +51,7 @@ public class RecipeFirebase {
 
     public static void saveRecipe(Recipe recipe, OnSuccessListener onSuccessListener) {
         DatabaseReference mdatabase = FirebaseDatabase.getInstance().getReference();
-        mdatabase.child("recipes").child(recipe.getUid()).setValue(recipe).addOnSuccessListener(onSuccessListener)
+        mdatabase.child("recipes").child(recipe.uid).setValue(recipe).addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener((error) -> {
                     Log.d(TAG, error.toString());
                 });

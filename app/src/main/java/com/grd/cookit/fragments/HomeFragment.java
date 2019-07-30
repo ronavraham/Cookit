@@ -1,4 +1,4 @@
-package com.grd.cookit;
+package com.grd.cookit.fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -8,6 +8,8 @@ import android.widget.Button;
 
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+
+import com.grd.cookit.R;
 
 public class HomeFragment extends Fragment {
 
