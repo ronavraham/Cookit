@@ -1,5 +1,6 @@
 package com.grd.cookit;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -111,10 +112,6 @@ public class MainActivity extends AppCompatActivity implements
         int id = menuItem.getItemId();
 
         switch (id) {
-            case R.id.navigate_to_home:
-                navController.navigate(R.id.action_homeFragment_self2);
-                break;
-
             case R.id.navigate_to_maps:
                 navController.navigate(R.id.action_homeFragment_to_mapsFragment);
                 break;
@@ -122,6 +119,16 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.navigate_to_add_recipe:
                 navController.navigate(R.id.action_homeFragment_to_addEditRecipeFragment);
                 break;
+
+//            case R.id.navigate_to_logout:
+//                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+//                firebaseAuth.signOut();
+//                Intent intent = getIntent();
+//                finish();
+//                startActivity(intent);
+//                break;
+
+
         }
         return true;
 
