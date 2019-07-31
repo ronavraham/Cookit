@@ -1,0 +1,28 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_nav">
+
+    <group
+        android:checkableBehavior="none"
+        android:menuCategory="container">
+
+        <item
+            android:id="@+id/navigate_to_home"
+            android:title="Android" />
+
+        <item
+            android:id="@+id/navigate_to_maps"
+            android:title="Dollar" />
+
+        <item
+            android:id="@+id/navigate_to_add_recipe"
+            android:title="Save" />
+
+    </group>
+    <group
+        android:checkableBehavior="none"
+        android:menuCategory="container">
+        <item android:title="Item" />
+    </group>
+
+</menu>
