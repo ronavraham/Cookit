@@ -11,6 +11,7 @@ public class Recipe {
     @NonNull
     public String uid;
     public String name;
+    public String description;
     public String imageUri;
     public String userGoogleUid;
     public Long timestamp;

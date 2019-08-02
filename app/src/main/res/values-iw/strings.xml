@@ -8,4 +8,8 @@
     <string name="add_recipe_title">הוסף מתכון חדש</string>
     <string name="take_picture_error">לא הצלחנו לצלם תמונה</string>
     <string name="take_picture_permission">צריך הרשאות למצלמה</string>
+    <string name="general_error_message">קרתה שגיאה, נסה שוב</string>
+    <string name="drawer_map">מפה</string>
+    <string name="drawer_add_recipe">הוסף מתכון</string>
+    <string name="drawer_logout">התנתק</string>
 </resources>

@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_nav">
+
+    <group
+        android:checkableBehavior="none"
+        android:menuCategory="container">
+
+        <item
+            android:id="@+id/navigate_to_maps"
+            android:title="@string/drawer_map"
+            android:icon="@drawable/ic_map_black_24dp"/>
+
+        <item
+            android:id="@+id/navigate_to_add_recipe"
+            android:title="@string/drawer_add_recipe"
+            android:icon="@drawable/ic_add_black_24dp"/>
+
+        <!--<item-->
+            <!--android:id="@+id/navigate_to_logout"-->
+            <!--android:title="@string/drawer_logout"-->
+            <!--android:icon="@drawable/ic_exit_to_app_black_24dp"/>-->
+
+    </group>
+
+</menu>

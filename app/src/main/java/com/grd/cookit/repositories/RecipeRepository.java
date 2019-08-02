@@ -4,9 +4,6 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Pair;
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.Tasks;
@@ -44,7 +41,12 @@ public class RecipeRepository {
         return this.recipes;
     }
 
-    public static void saveRecipe(String recipeName, File image, Location location, OnSuccessListener onSuccessListener) {
+    public static void saveRecipe(String recipeName,
+                                  String description,
+                                  File image,
+                                  Location location,
+                                  OnSuccessListener onSuccessListener,
+                                  OnFailureListener onFailureListener) {
         Tasks.call(Executors.newSingleThreadExecutor(), () -> {
             Recipe recipe = new Recipe();
             String uid = UUID.randomUUID().toString();
@@ -52,14 +54,14 @@ public class RecipeRepository {
             recipe.userGoogleUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
             recipe.timestamp = new Date().getTime();
             recipe.name = recipeName;
+            recipe.description = description;
             recipe.longitude = location.getLongitude();
             recipe.latitude = location.getLatitude();
 
             RecipeFirebase.saveImage(image, uid, (newImageUrl) -> {
                 recipe.imageUri = newImageUrl.toString();
-                RecipeFirebase.saveRecipe(recipe, onSuccessListener);
-            });
-
+                RecipeFirebase.saveRecipe(recipe, onSuccessListener,onFailureListener);
+            },onFailureListener);
             return null;
         });
 

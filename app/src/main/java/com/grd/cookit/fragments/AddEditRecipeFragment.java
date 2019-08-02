@@ -56,6 +56,7 @@ public class AddEditRecipeFragment extends Fragment {
     ProgressBar progressBar;
     EditText editText;
     File tempFile;
+    EditText descriptionText;
     private boolean locationPermissionGranted;
 
 
@@ -75,7 +76,9 @@ public class AddEditRecipeFragment extends Fragment {
         progressBar = v.findViewById(R.id.progressBar);
         imageView = v.findViewById(R.id.recipeImage);
         editText = v.findViewById(R.id.recipeNameEdit);
+        descriptionText = v.findViewById(R.id.descriptionEdit);
         progressBar.setVisibility(View.INVISIBLE);
+
 
         Button btnTakePicture = v.findViewById(R.id.takePictureBtn);
         Button btnPublish = v.findViewById(R.id.publishBtn);
@@ -134,11 +137,14 @@ public class AddEditRecipeFragment extends Fragment {
     public void publishRecipe() {
         progressBar.setVisibility(View.VISIBLE);
         getPhoneLocation((location) -> {
-            RecipeRepository.saveRecipe(editText.getText().toString(), tempFile, location, (e) -> {
+            RecipeRepository.saveRecipe(editText.getText().toString(), descriptionText.getText().toString(), tempFile, location, (e) -> {
                 progressBar.setVisibility(View.INVISIBLE);
                 Toast.makeText(getActivity(), "succeed", Toast.LENGTH_SHORT).show();
                 NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
                 navController.popBackStack();
+            },(error)->{
+                progressBar.setVisibility(View.INVISIBLE);
+                Toast.makeText(getActivity(),R.string.general_error_message,Toast.LENGTH_SHORT).show();
             });
         });
     }
