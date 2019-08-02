@@ -1,5 +1,6 @@
 package com.grd.cookit.repositories;
 
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.util.Pair;
@@ -17,8 +18,10 @@ import com.grd.cookit.model.entities.Recipe;
 import com.grd.cookit.model.entities.User;
 import com.grd.cookit.model.firebase.RecipeFirebase;
 import com.grd.cookit.model.ui.UIRecipe;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -93,17 +96,17 @@ public class RecipeRepository {
             uiRecipe.timestamp = new Date(recipe.timestamp);
             uiRecipe.latitude = recipe.latitude;
             uiRecipe.longitude = recipe.longitude;
-//            try {
-//                postForList.Background = new BitmapDrawable(Picasso.get().load(recipe.getImageUri()).get());
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//
-//            try {
-//                postForList.ProfileImage = new BitmapDrawable(Picasso.get().load(user.getProfileUri()).get());
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
+            try {
+                uiRecipe.imagine = new BitmapDrawable(Picasso.get().load(recipe.imageUri).get());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                uiRecipe.userProfileImage = new BitmapDrawable(Picasso.get().load(user.getProfileUri()).get());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             finalResult.add(uiRecipe);
         });

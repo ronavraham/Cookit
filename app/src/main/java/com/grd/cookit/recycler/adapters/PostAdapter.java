@@ -58,9 +58,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostHolder> {
     public void onBindViewHolder(@NonNull PostHolder holder, int position) {
         UIRecipe currentPost = this.Posts.get(position);
         holder.postUid = currentPost.uid;
-        holder.Background.setBackgroundDrawable(currentPost.RecipeImage);
+        holder.Background.setBackgroundDrawable(currentPost.imagine);
         holder.PostText.setText(currentPost.name);
-        holder.ProfileImage.setImageDrawable(currentPost.ProfileImage);
+        holder.ProfileImage.setImageDrawable(currentPost.userProfileImage);
         holder.Timestamp.setText(new PrettyTime().format(currentPost.timestamp));
         holder.UserName.setText(currentPost.userName);
         if (this.deletePostListener != null) {

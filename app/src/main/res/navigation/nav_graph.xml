@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/feedFragment">
 
     <fragment
-        android:id="@+id/homeFragment"
+        android:id="@+id/feedFragment"
         android:name="com.grd.cookit.fragments.FeedFragment"
-        android:label="fragment_home"
+        android:label="Feed"
         tools:layout="@layout/fragment_feed" >
         <action
             android:id="@+id/action_homeFragment_to_addEditRecipeFragment"
@@ -17,7 +17,7 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim"
-            app:popUpTo="@+id/homeFragment">
+            app:popUpTo="@+id/feedFragment">
             <argument
                 android:name="type"
                 android:defaultValue="add" />
@@ -27,8 +27,8 @@
             app:destination="@id/mapsFragment" />
         <action
             android:id="@+id/action_homeFragment_self2"
-            app:destination="@id/homeFragment"
-            app:popUpTo="@+id/homeFragment"
+            app:destination="@id/feedFragment"
+            app:popUpTo="@+id/feedFragment"
             app:popUpToInclusive="true" />
     </fragment>
     <fragment
