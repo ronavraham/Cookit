@@ -1,5 +1,7 @@
 package com.grd.cookit.model.ui;
 
+import android.graphics.drawable.Drawable;
+
 import java.util.Date;
 
 public class UIRecipe {
@@ -9,6 +11,8 @@ public class UIRecipe {
     public double longitude;
     public double latitude;
     public Date timestamp;
+    public Drawable imagine;
+    public Drawable userProfileImage;
 
     public Date getTimestamp() {
         return timestamp;
