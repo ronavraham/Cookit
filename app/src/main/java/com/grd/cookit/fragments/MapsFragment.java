@@ -1,5 +1,6 @@
 package com.grd.cookit.fragments;
 
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.grd.cookit.R;
+import com.grd.cookit.viewModels.RecipeViewModel;
 
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
@@ -29,9 +31,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private FusedLocationProviderClient fusedLocationClient;
     private final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean locationPermissionGranted;
+    private RecipeViewModel recipeViewModel;
 
     public MapsFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        recipeViewModel = RecipeViewModel.instance;
     }
 
     @Override
@@ -52,6 +61,17 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap = googleMap;
 
         initMap();
+
+        recipeViewModel.getAllRecipes().observe(this, recipes -> {
+            recipes.forEach(recipe -> {
+                LatLng latLng = new LatLng(recipe.latitude, recipe.longitude);
+
+                mMap.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .draggable(true)
+                        .title("Current Location"));
+            });
+        });
     }
 
     private void initMap() {
