@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:contentPadding="5dp"
+    app:cardUseCompatPadding="true"
+    app:cardElevation="5dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/post_profile_bar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/post_profile_image"
+                android:layout_gravity="center"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="5dp"
+                android:background="@drawable/outline_perm_identity_black_48dp"/>
+
+            <TextView
+                android:id="@+id/post_user_name"
+                android:layout_gravity="center"
+                android:textStyle="bold"
+                android:layout_marginLeft="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nir Haviv" />
+
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/post_time_ago"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:layout_gravity="center"
+                android:text="A minute ago"
+                android:layout_weight="1"
+                android:layout_marginRight="5dp"/>
+
+            <com.mikepenz.iconics.view.IconicsButton
+                android:id="@+id/remove_post_button"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:textAlignment="center"
+                android:gravity="end"
+                android:layout_gravity="center"
+                android:background="@drawable/outline_delete_black_48dp"
+                android:layout_marginLeft="5dp">
+            </com.mikepenz.iconics.view.IconicsButton>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+        <ImageView
+            android:id="@+id/post_backround"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintTop_toBottomOf="@id/post_profile_bar"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/post_text"
+            android:text="Hello World"
+            android:scrollbars="vertical"
+            android:maxHeight="100dp"
+            android:textColor="@color/md_black_1000"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/post_backround"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.cardview.widget.CardView>

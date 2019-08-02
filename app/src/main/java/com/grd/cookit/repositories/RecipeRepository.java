@@ -94,7 +94,7 @@ public class RecipeRepository {
             uiRecipe.latitude = recipe.latitude;
             uiRecipe.longitude = recipe.longitude;
 //            try {
-//                postForList.Background = new BitmapDrawable(Picasso.get().load(post.getImageUri()).get());
+//                postForList.Background = new BitmapDrawable(Picasso.get().load(recipe.getImageUri()).get());
 //            } catch (IOException e) {
 //                e.printStackTrace();
 //            }

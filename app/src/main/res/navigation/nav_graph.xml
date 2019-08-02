@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="com.grd.cookit.fragments.HomeFragment"
+        android:name="com.grd.cookit.fragments.FeedFragment"
         android:label="fragment_home"
-        tools:layout="@layout/fragment_home" >
+        tools:layout="@layout/fragment_feed" >
         <action
             android:id="@+id/action_homeFragment_to_addEditRecipeFragment"
             app:destination="@id/addEditRecipeFragment"
