@@ -11,7 +11,7 @@
         android:label="Feed"
         tools:layout="@layout/fragment_feed" >
         <action
-            android:id="@+id/action_homeFragment_to_addEditRecipeFragment"
+            android:id="@+id/action_feedFragment_to_addEditRecipeFragment"
             app:destination="@id/addEditRecipeFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
@@ -23,10 +23,13 @@
                 android:defaultValue="add" />
         </action>
         <action
-            android:id="@+id/action_homeFragment_to_mapsFragment"
+            android:id="@+id/action_feedFragment_to_mapsFragment"
             app:destination="@id/mapsFragment" />
         <action
-            android:id="@+id/action_homeFragment_self2"
+            android:id="@+id/action_feedFragment_to_profileFragment"
+            app:destination="@id/profileFragment" />
+        <action
+            android:id="@+id/action_feedFragment_self2"
             app:destination="@id/feedFragment"
             app:popUpTo="@+id/feedFragment"
             app:popUpToInclusive="true" />
@@ -45,4 +48,9 @@
         android:name="com.grd.cookit.fragments.MapsFragment"
         android:label="fragment_maps"
         tools:layout="@layout/fragment_maps" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.grd.cookit.fragments.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" />
 </navigation>

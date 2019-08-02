@@ -1,7 +1,9 @@
 package com.grd.cookit.repositories;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Pair;
 
@@ -10,6 +12,7 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,9 +37,11 @@ import java.util.stream.Collectors;
 public class RecipeRepository {
     public static final RecipeRepository instance = new RecipeRepository();
     public MutableLiveData<List<UIRecipe>> recipes;
+    public MutableLiveData<List<UIRecipe>> recipesForUser;
 
     RecipeRepository() {
         recipes = new MutableLiveData<>();
+        recipesForUser = new MutableLiveData<>();
     }
 
     public LiveData<List<UIRecipe>> getAllRecipes() {
@@ -46,6 +51,15 @@ public class RecipeRepository {
         }
 
         return this.recipes;
+    }
+
+    public LiveData<List<UIRecipe>> getAllRecipesForProfile(String uid) {
+        synchronized (this) {
+            AsyncTask task = new GetAllRecipesForProfileTask();
+            task.execute(new String[]{uid});
+        }
+
+        return this.recipesForUser;
     }
 
     public static void saveRecipe(String recipeName,
@@ -74,7 +88,7 @@ public class RecipeRepository {
 
     }
 
-    private List<UIRecipe> makePostsForList(List<Recipe> recipes, List<User> users) {
+    private List<UIRecipe> makeRecipesForList(List<Recipe> recipes, List<User> users) {
         List<UIRecipe> result = new ArrayList<>();
 
         List<UIRecipe> finalResult = result;
@@ -115,6 +129,12 @@ public class RecipeRepository {
         return result;
     }
 
+    private List<UIRecipe> makeRecipesForList(List<Recipe> posts, User user) {
+        List<User> userList = new ArrayList<>();
+        userList.add(user);
+        return makeRecipesForList(posts, userList);
+    }
+
     private class GetAllRecipesTask extends AsyncTask<String, String, List<UIRecipe>> {
 
         @Override
@@ -126,7 +146,7 @@ public class RecipeRepository {
                     Pair<List<Recipe>, List<User>> tuple = (Pair<List<Recipe>, List<User>>) pair;
                     List<Recipe> posts = tuple.first;
                     List<User> users = tuple.second;
-                    List<UIRecipe> result = makePostsForList(posts, users);
+                    List<UIRecipe> result = makeRecipesForList(posts, users);
                     recipes.postValue(result);
 
                     AppLocalDb.db.usersDao().insertAllUsers(users.toArray(new User[0]));
@@ -140,6 +160,43 @@ public class RecipeRepository {
 
             return null;
         }
+    }
+
+    private class GetAllRecipesForProfileTask extends AsyncTask<String, Void, List<UIRecipe>> {
+        @Override
+        protected List<UIRecipe> doInBackground(String... uid) {
+            final TaskCompletionSource<Pair<List<Recipe>, User>> source = new TaskCompletionSource<>();
+
+            RecipeFirebase.getInstance().getAllCollectionsForProfile(uid[0], (pair) -> {
+                Tasks.call(Executors.newSingleThreadExecutor(), () -> {
+                    Pair<List<Recipe>, User> tuple = (Pair<List<Recipe>, User>) pair;
+                    List<Recipe> posts = tuple.first;
+                    User user = tuple.second;
+                    List<UIRecipe> result = makeRecipesForList(posts, user);
+                    recipesForUser.postValue(result);
+
+                    AppLocalDb.db.usersDao().insertAllUsers(user);
+                    AppLocalDb.db.recipesDao().insertAllPosts(posts.toArray(new Recipe[0]));
+
+                    return true;
+                });
+            });
+
+            List<Recipe> postsFromDb = AppLocalDb.db.recipesDao().getAllPosts();
+            User usersFromDb = AppLocalDb.db.usersDao().getUserByUid(uid[0]);
+
+            recipesForUser.postValue(makeRecipesForList(postsFromDb, usersFromDb));
+
+            return null;
+        }
+    }
+
+    public void deleteRecipe(String postUid) {
+        Tasks.call(Executors.newSingleThreadExecutor(), () -> {
+            RecipeFirebase.getInstance().deletePost(postUid);
+            AppLocalDb.db.recipesDao().deletePost(postUid);
+            return true;
+        });
     }
 
 }
