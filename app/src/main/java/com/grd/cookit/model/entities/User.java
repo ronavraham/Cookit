@@ -18,24 +18,24 @@ public class User {
     public String name;
     public String profileUri;
     public String email;
-    public String userUid;
+    public String googleUid;
 
     public User(){}
 
     public User(FirebaseUser currentUser) {
-        this.setUserUid(currentUser.getUid());
+        this.setGoogleUid(currentUser.getUid());
         this.setProfileUri(currentUser.getPhotoUrl().toString());
         this.setName(currentUser.getDisplayName());
         this.setEmail(currentUser.getEmail());
         this.setUid(UUID.randomUUID().toString());
     }
 
-    public String getUserUid() {
-        return userUid;
+    public String getGoogleUid() {
+        return googleUid;
     }
 
-    public void setUserUid(String userUid) {
-        this.userUid = userUid;
+    public void setGoogleUid(String userUid) {
+        this.googleUid = userUid;
     }
 
     @NonNull

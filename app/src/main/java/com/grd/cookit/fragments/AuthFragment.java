@@ -8,11 +8,13 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.grd.cookit.R;
 import com.grd.cookit.activities.AuthActivity;
 import com.grd.cookit.model.entities.User;
+import com.grd.cookit.viewModels.UserViewModel;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -20,10 +22,13 @@ import butterknife.OnClick;
 public class AuthFragment extends Fragment {
 
     private View view;
+    private UserViewModel userViewModel;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+
+        userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
     }
 
     public AuthFragment() {
@@ -46,8 +51,9 @@ public class AuthFragment extends Fragment {
                 Toast.makeText(getActivity(), "login was successful", Toast.LENGTH_SHORT);
 
                 User newUser = new User(FirebaseAuth.getInstance().getCurrentUser());
+
+                userViewModel.saveUser(newUser);
             }
         }, getActivity());
     }
-
 }
