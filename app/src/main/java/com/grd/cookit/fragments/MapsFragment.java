@@ -63,13 +63,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         initMap();
 
         recipeViewModel.getAllRecipes().observe(this, recipes -> {
+            mMap.clear();
             recipes.forEach(recipe -> {
                 LatLng latLng = new LatLng(recipe.latitude, recipe.longitude);
 
                 mMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .draggable(true)
-                        .title("Current Location"));
+                        .title(recipe.name));
             });
         });
     }
