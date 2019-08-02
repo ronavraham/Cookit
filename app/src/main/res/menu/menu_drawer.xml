@@ -16,6 +16,11 @@
             android:title="@string/drawer_add_recipe"
             android:icon="@drawable/ic_add_black_24dp"/>
 
+        <item
+            android:id="@+id/navigate_to_user_profile"
+            android:title="Profile"
+            android:icon="@drawable/ic_add_black_24dp"/>
+
         <!--<item-->
             <!--android:id="@+id/navigate_to_logout"-->
             <!--android:title="@string/drawer_logout"-->

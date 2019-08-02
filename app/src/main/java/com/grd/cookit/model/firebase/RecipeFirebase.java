@@ -22,11 +22,13 @@ import com.grd.cookit.model.entities.User;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RecipeFirebase {
     private static RecipeFirebase instance = null;
     private static final String TAG = "RecipeFirebase";
     ValueEventListener allCollectionseventListener;
+    ValueEventListener profileEventListener;
 
 
     protected RecipeFirebase() {
@@ -98,6 +100,52 @@ public class RecipeFirebase {
                 }
             });
         }
+    }
+
+    public void getAllCollectionsForProfile(String userUid, final OnSuccessListener listener) {
+        DatabaseReference fbPostsRef = FirebaseDatabase.getInstance().getReference();
+        if (profileEventListener == null) {
+            profileEventListener = fbPostsRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    DataSnapshot postsRef = dataSnapshot.child("recipes");
+                    DataSnapshot usersRef = dataSnapshot.child("users");
+                    List<User> users = new ArrayList<>();
+                    List<Recipe> recipes = new ArrayList<>();
+
+                    for (DataSnapshot postSnapshot : postsRef.getChildren()) {
+                        Recipe r = postSnapshot.getValue(Recipe.class);
+                        recipes.add(r);
+                    }
+
+                    for (DataSnapshot postSnapshot : usersRef.getChildren()) {
+                        User u = postSnapshot.getValue(User.class);
+                        users.add(u);
+                    }
+
+                    recipes = recipes.stream().filter(post -> post.userGoogleUid.equals(userUid)).collect(Collectors.toList());
+                    User user = users.stream().filter(currUser -> currUser.googleUid.equals(userUid)).findFirst().get();
+
+                    listener.onSuccess(new Pair(recipes, user));
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    listener.onSuccess(null);
+                }
+            });
+        }
+    }
+
+    public void deletePost(String postUid) {
+        // delete post image
+        // delete post itself
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference imagesRef = storage.getReference().child("images").child(postUid);
+        imagesRef.delete();
+        FirebaseDatabase.getInstance().getReference()
+                .child("recipes").child(postUid).setValue(null);
+
     }
 
 }

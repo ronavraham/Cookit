@@ -1,5 +1,7 @@
 package com.grd.cookit.viewModels;
 
+import android.graphics.Bitmap;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -13,13 +15,18 @@ public class RecipeViewModel extends ViewModel {
     public static final RecipeViewModel instance = new RecipeViewModel();
 
     public LiveData<List<UIRecipe>> recipes;
+    public LiveData<List<UIRecipe>> recipesForProfile;
     private boolean isRecipesBinded = false;
+    private boolean isProfileBinded = false;
     public MutableLiveData<Boolean> profileBusy;
     public MutableLiveData<Boolean> feedBusy;
 
     private RecipeViewModel() {
         super();
+        profileBusy = new MutableLiveData<>();
         feedBusy = new MutableLiveData<>();
+
+        profileBusy.setValue(false);
         feedBusy.setValue(false);
     }
 
@@ -30,6 +37,26 @@ public class RecipeViewModel extends ViewModel {
             recipes = RecipeRepository.instance.getAllRecipes();
         }
         return recipes;
+    }
+
+    public LiveData<List<UIRecipe>> getAllProfilePosts(String uid) {
+        if (!isProfileBinded) {
+            isProfileBinded = true;
+            profileBusy.setValue(true);
+            recipesForProfile = RecipeRepository.instance.getAllRecipesForProfile(uid);
+        }
+        return recipesForProfile;
+    }
+
+
+    public void deletePost(String postUid) {
+        RecipeRepository.instance.deleteRecipe(postUid);
+        updateBusy();
+    }
+
+    private void updateBusy() {
+        profileBusy.setValue(true);
+        feedBusy.setValue(true);
     }
 
 }
