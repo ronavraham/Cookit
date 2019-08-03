@@ -123,7 +123,7 @@ public class RecipeFirebase {
                         users.add(u);
                     }
 
-                    recipes = recipes.stream().filter(post -> post.userGoogleUid.equals(userUid)).collect(Collectors.toList());
+                    recipes = recipes.stream().filter(post -> post.getUserGoogleUid().equals(userUid)).collect(Collectors.toList());
                     User user = users.stream().filter(currUser -> currUser.googleUid.equals(userUid)).findFirst().get();
 
                     listener.onSuccess(new Pair(recipes, user));
