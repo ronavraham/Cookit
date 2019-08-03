@@ -2,6 +2,7 @@ package com.grd.cookit.repositories;
 
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Pair;
 
@@ -85,6 +86,33 @@ public class RecipeRepository {
 
     }
 
+    public void updateRecipe(String recipeId,
+                             Uri oldFile,
+                             File newFile,
+                             String newName,
+                             String newDesc,
+                             OnSuccessListener onSuccessListener,
+                             OnFailureListener onFailureListener) {
+        Tasks.call(Executors.newSingleThreadExecutor(), () -> {
+            Uri newFileUri = oldFile;
+            if (newFile == null) {
+                RecipeFirebase.getInstance().updateRecipe(recipeId, newName, newDesc, newFileUri, onSuccessListener, onFailureListener);
+            } else {
+                RecipeFirebase.getInstance().deleteImage(recipeId, (e) -> {
+                    RecipeFirebase.getInstance().saveImage(newFile, recipeId, (newImageUrl) -> {
+                        RecipeFirebase.getInstance().updateRecipe(recipeId,
+                                newName,
+                                newDesc,
+                                newImageUrl,
+                                onSuccessListener,
+                                onFailureListener);
+                    }, onFailureListener);
+                }, onFailureListener);
+            }
+            return null;
+        });
+    }
+
     private List<UIRecipe> makeRecipesForList(List<Recipe> recipes, List<User> users) {
         List<UIRecipe> result = new ArrayList<>();
 
@@ -162,7 +190,7 @@ public class RecipeRepository {
             List<Recipe> postsFromDb = AppLocalDb.db.recipesDao().getAllRecipes();
             List<User> usersFromDb = AppLocalDb.db.usersDao().getAllUsers();
 
-            recipes.postValue(makeRecipesForList(postsFromDb,usersFromDb));
+            recipes.postValue(makeRecipesForList(postsFromDb, usersFromDb));
 
             return null;
         }

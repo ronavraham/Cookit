@@ -103,7 +103,7 @@ public class AddEditRecipeFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_add_edit_recipe, container, false);
         ButterKnife.bind(this, v);
-            // change toolbar title
+        // change toolbar title
         Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
         progressBar.setVisibility(View.GONE);
 
@@ -119,14 +119,14 @@ public class AddEditRecipeFragment extends Fragment {
 
         } else {
             toolbar.setTitle(R.string.edit_recipe_title);
-            recipeViewModel.getselectedRecipe().observe(this,(recipe)->{
+            recipeViewModel.getselectedRecipe().observe(this, (recipe) -> {
                 currRecipe = recipe;
                 imageView.setBackgroundDrawable(recipe.recipeImage);
                 editText.setText(recipe.name);
                 descriptionText.setText(recipe.description);
             });
 
-            btnPublish.setOnClickListener(vi->{
+            btnPublish.setOnClickListener(vi -> {
                 updateRecipe();
             });
         }
@@ -159,8 +159,19 @@ public class AddEditRecipeFragment extends Fragment {
         }
     }
 
-    private void updateRecipe(){
-
+    private void updateRecipe() {
+        String recipeName = editText.getText().toString();
+        String recipeDesc = descriptionText.getText().toString();
+        progressBar.setVisibility(View.VISIBLE);
+        recipeViewModel.updateRecipe(currRecipe, tempFile, recipeName, recipeDesc, (e) -> {
+                    Toast.makeText(getActivity(), "succeed", Toast.LENGTH_SHORT).show();
+                    Navigation.findNavController(getView()).popBackStack();
+                    Navigation.findNavController(getView()).popBackStack();
+                },
+                (e) -> {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    Toast.makeText(getActivity(), R.string.general_error_message, Toast.LENGTH_SHORT).show();
+                });
     }
 
     @Override
@@ -178,6 +189,7 @@ public class AddEditRecipeFragment extends Fragment {
         } else {
             Log.e(TAG, "onActivityResult: could not get camera data");
             tempFile.delete();
+            tempFile = null;
             Toast.makeText(getActivity(), R.string.take_picture_error, Toast.LENGTH_SHORT).show();
         }
     }
