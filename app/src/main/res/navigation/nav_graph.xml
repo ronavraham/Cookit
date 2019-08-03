@@ -52,5 +52,12 @@
         android:id="@+id/profileFragment"
         android:name="com.grd.cookit.fragments.ProfileFragment"
         android:label="Profile"
-        tools:layout="@layout/fragment_profile" />
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_profileFragment_to_addEditRecipeFragment"
+            app:destination="@id/addEditRecipeFragment" >
+            <argument android:defaultValue="add"
+                android:name="type" />
+        </action>
+    </fragment>
 </navigation>
