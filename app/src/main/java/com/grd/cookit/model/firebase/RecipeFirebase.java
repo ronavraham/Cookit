@@ -61,7 +61,7 @@ public class RecipeFirebase {
 
     public static void saveRecipe(Recipe recipe, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
         DatabaseReference mdatabase = FirebaseDatabase.getInstance().getReference();
-        mdatabase.child("recipes").child(recipe.uid).setValue(recipe).addOnSuccessListener(onSuccessListener)
+        mdatabase.child("recipes").child(recipe.getUid()).setValue(recipe).addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener((error) -> {
                     Log.d(TAG, error.toString());
                     onFailureListener.onFailure(error);

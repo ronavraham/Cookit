@@ -57,18 +57,18 @@ public class RecipeRepository {
         Tasks.call(Executors.newSingleThreadExecutor(), () -> {
             Recipe recipe = new Recipe();
             String uid = UUID.randomUUID().toString();
-            recipe.uid = uid;
-            recipe.userGoogleUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            recipe.timestamp = new Date().getTime();
-            recipe.name = recipeName;
-            recipe.description = description;
-            recipe.longitude = location.getLongitude();
-            recipe.latitude = location.getLatitude();
+            recipe.setUid(uid);
+            recipe.setUserGoogleUid(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            recipe.setTimestamp(new Date().getTime());
+            recipe.setName(recipeName);
+            recipe.setDescription(description);
+            recipe.setLongitude(location.getLongitude());
+            recipe.setLatitude(location.getLatitude());
 
             RecipeFirebase.saveImage(image, uid, (newImageUrl) -> {
-                recipe.imageUri = newImageUrl.toString();
-                RecipeFirebase.saveRecipe(recipe, onSuccessListener,onFailureListener);
-            },onFailureListener);
+                recipe.setImageUri(newImageUrl.toString());
+                RecipeFirebase.saveRecipe(recipe, onSuccessListener, onFailureListener);
+            }, onFailureListener);
             return null;
         });
 
@@ -81,7 +81,7 @@ public class RecipeRepository {
 
         recipes.stream().forEach((recipe) -> {
             Optional<User> optUser = users.stream().filter(
-                    (user1) -> user1.getGoogleUid().equals(recipe.userGoogleUid))
+                    (user1) -> user1.getGoogleUid().equals(recipe.getUserGoogleUid()))
                     .findAny();
 
             if (!optUser.isPresent()) {
@@ -91,13 +91,13 @@ public class RecipeRepository {
             User user = optUser.get();
 
             UIRecipe uiRecipe = new UIRecipe();
-            uiRecipe.uid = recipe.uid;
+            uiRecipe.uid = recipe.getUid();
             uiRecipe.userName = user.getName();
-            uiRecipe.timestamp = new Date(recipe.timestamp);
-            uiRecipe.latitude = recipe.latitude;
-            uiRecipe.longitude = recipe.longitude;
+            uiRecipe.timestamp = new Date(recipe.getTimestamp());
+            uiRecipe.latitude = recipe.getLatitude();
+            uiRecipe.longitude = recipe.getLongitude();
             try {
-                uiRecipe.imagine = new BitmapDrawable(Picasso.get().load(recipe.imageUri).get());
+                uiRecipe.imagine = new BitmapDrawable(Picasso.get().load(recipe.getImageUri()).get());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -129,14 +129,19 @@ public class RecipeRepository {
                     List<UIRecipe> result = makePostsForList(posts, users);
                     recipes.postValue(result);
 
+                    AppLocalDb.db.recipesDao().deleteAllRecipes();
+                    AppLocalDb.db.usersDao().deleteAllUsers();
+
                     AppLocalDb.db.usersDao().insertAllUsers(users.toArray(new User[0]));
-                    AppLocalDb.db.recipesDao().insertAllPosts(posts.toArray(new Recipe[0]));
+                    AppLocalDb.db.recipesDao().insertAllRecipes(posts.toArray(new Recipe[0]));
                     return true;
                 });
             });
 
-            List<Recipe> postsFromDb = AppLocalDb.db.recipesDao().getAllPosts();
+            List<Recipe> postsFromDb = AppLocalDb.db.recipesDao().getAllRecipes();
             List<User> usersFromDb = AppLocalDb.db.usersDao().getAllUsers();
+
+            recipes.postValue(makePostsForList(postsFromDb,usersFromDb));
 
             return null;
         }
