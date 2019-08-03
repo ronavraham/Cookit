@@ -113,6 +113,10 @@ public class AddEditRecipeFragment extends Fragment {
         if (type.equals("add")) {
             toolbar.setTitle(R.string.add_recipe_title);
 
+            btnPublish.setOnClickListener((vi) -> {
+                publishRecipe();
+            });
+
         } else {
             toolbar.setTitle(R.string.edit_recipe_title);
             recipeViewModel.getselectedRecipe().observe(this,(recipe)->{
@@ -121,11 +125,12 @@ public class AddEditRecipeFragment extends Fragment {
                 editText.setText(recipe.name);
                 descriptionText.setText(recipe.description);
             });
+
+            btnPublish.setOnClickListener(vi->{
+                updateRecipe();
+            });
         }
 
-        btnPublish.setOnClickListener((vi) -> {
-            publishRecipe();
-        });
         btnTakePicture.setOnClickListener((vi) -> {
             takePicture();
         });
@@ -152,6 +157,10 @@ public class AddEditRecipeFragment extends Fragment {
             Log.d(TAG, "takePicture: ask user for permissions");
             ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, PERMISSION_ALL);
         }
+    }
+
+    private void updateRecipe(){
+
     }
 
     @Override
