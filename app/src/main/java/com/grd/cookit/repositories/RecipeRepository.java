@@ -161,7 +161,7 @@ public class RecipeRepository {
             List<Recipe> postsFromDb = AppLocalDb.db.recipesDao().getAllRecipes();
             List<User> usersFromDb = AppLocalDb.db.usersDao().getAllUsers();
 
-            recipes.postValue(makePostsForList(postsFromDb,usersFromDb));
+            recipes.postValue(makeRecipesForList(postsFromDb,usersFromDb));
 
             return null;
         }
@@ -181,13 +181,13 @@ public class RecipeRepository {
                     recipesForUser.postValue(result);
 
                     AppLocalDb.db.usersDao().insertAllUsers(user);
-                    AppLocalDb.db.recipesDao().insertAllPosts(posts.toArray(new Recipe[0]));
+                    AppLocalDb.db.recipesDao().insertAllRecipes(posts.toArray(new Recipe[0]));
 
                     return true;
                 });
             });
 
-            List<Recipe> postsFromDb = AppLocalDb.db.recipesDao().getAllPosts();
+            List<Recipe> postsFromDb = AppLocalDb.db.recipesDao().getAllRecipes();
             User usersFromDb = AppLocalDb.db.usersDao().getUserByUid(uid[0]);
 
             recipesForUser.postValue(makeRecipesForList(postsFromDb, usersFromDb));
@@ -199,7 +199,7 @@ public class RecipeRepository {
     public void deleteRecipe(String postUid) {
         Tasks.call(Executors.newSingleThreadExecutor(), () -> {
             RecipeFirebase.getInstance().deletePost(postUid);
-            AppLocalDb.db.recipesDao().deletePost(postUid);
+            AppLocalDb.db.recipesDao().deleteRecipe(postUid);
             return true;
         });
     }
