@@ -8,8 +8,8 @@
     <fragment
         android:id="@+id/feedFragment"
         android:name="com.grd.cookit.fragments.FeedFragment"
-        android:label="Feed"
-        tools:layout="@layout/fragment_feed" >
+        android:label="@string/feed_title"
+        tools:layout="@layout/fragment_feed">
         <action
             android:id="@+id/action_feedFragment_to_addEditRecipeFragment"
             app:destination="@id/addEditRecipeFragment"
@@ -33,24 +33,53 @@
             app:destination="@id/feedFragment"
             app:popUpTo="@+id/feedFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_feedFragment_to_recipeInfoFragment"
+            app:destination="@id/recipeInfoFragment" />
     </fragment>
     <fragment
         android:id="@+id/addEditRecipeFragment"
         android:name="com.grd.cookit.fragments.AddEditRecipeFragment"
-        android:label="fragment_add_edit_recipe"
-        tools:layout="@layout/fragment_add_edit_recipe" >
+        tools:layout="@layout/fragment_add_edit_recipe">
         <argument
             android:name="type"
-            app:argType="string"/>
+            app:argType="string"
+            android:defaultValue='"add"' />
     </fragment>
     <fragment
         android:id="@+id/mapsFragment"
         android:name="com.grd.cookit.fragments.MapsFragment"
-        android:label="fragment_maps"
+        android:label="@string/map_title"
         tools:layout="@layout/fragment_maps" />
     <fragment
         android:id="@+id/profileFragment"
         android:name="com.grd.cookit.fragments.ProfileFragment"
-        android:label="Profile"
-        tools:layout="@layout/fragment_profile" />
+        android:label="@string/profile_title"
+        tools:layout="@layout/fragment_profile">
+        <action
+            android:id="@+id/action_profileFragment_to_addEditRecipeFragment"
+            app:destination="@id/addEditRecipeFragment">
+            <argument
+                android:name="type"
+                android:defaultValue="add" />
+        </action>
+        <action
+            android:id="@+id/action_profileFragment_to_recipeInfoFragment"
+            app:destination="@id/recipeInfoFragment"
+            >
+            <argument android:name="recipeId" />
+        </action>
+    </fragment>
+    <fragment
+        android:id="@+id/recipeInfoFragment"
+        android:name="com.grd.cookit.fragments.RecipeInfoFragment"
+        android:label="@string/recipe_info_title"
+        tools:layout="@layout/recipe_info_fragment" >
+        <argument
+            android:name="recipeId"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_recipeInfoFragment_to_addEditRecipeFragment"
+            app:destination="@id/addEditRecipeFragment" />
+    </fragment>
 </navigation>

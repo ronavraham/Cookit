@@ -1,6 +1,5 @@
 package com.grd.cookit.repositories;
 
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.net.Uri;
@@ -12,7 +11,6 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
@@ -88,6 +86,33 @@ public class RecipeRepository {
 
     }
 
+    public void updateRecipe(String recipeId,
+                             Uri oldFile,
+                             File newFile,
+                             String newName,
+                             String newDesc,
+                             OnSuccessListener onSuccessListener,
+                             OnFailureListener onFailureListener) {
+        Tasks.call(Executors.newSingleThreadExecutor(), () -> {
+            Uri newFileUri = oldFile;
+            if (newFile == null) {
+                RecipeFirebase.getInstance().updateRecipe(recipeId, newName, newDesc, newFileUri, onSuccessListener, onFailureListener);
+            } else {
+                RecipeFirebase.getInstance().deleteImage(recipeId, (e) -> {
+                    RecipeFirebase.getInstance().saveImage(newFile, recipeId, (newImageUrl) -> {
+                        RecipeFirebase.getInstance().updateRecipe(recipeId,
+                                newName,
+                                newDesc,
+                                newImageUrl,
+                                onSuccessListener,
+                                onFailureListener);
+                    }, onFailureListener);
+                }, onFailureListener);
+            }
+            return null;
+        });
+    }
+
     private List<UIRecipe> makeRecipesForList(List<Recipe> recipes, List<User> users) {
         List<UIRecipe> result = new ArrayList<>();
 
@@ -110,8 +135,12 @@ public class RecipeRepository {
             uiRecipe.timestamp = new Date(recipe.getTimestamp());
             uiRecipe.latitude = recipe.getLatitude();
             uiRecipe.longitude = recipe.getLongitude();
+            uiRecipe.description = recipe.getDescription();
+            uiRecipe.name = recipe.getName();
+            uiRecipe.userGoogleId = recipe.getUserGoogleUid();
+            uiRecipe.imageUri = recipe.getImageUri();
             try {
-                uiRecipe.imagine = new BitmapDrawable(Picasso.get().load(recipe.getImageUri()).get());
+                uiRecipe.recipeImage = new BitmapDrawable(Picasso.get().load(recipe.getImageUri()).get());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -161,7 +190,7 @@ public class RecipeRepository {
             List<Recipe> postsFromDb = AppLocalDb.db.recipesDao().getAllRecipes();
             List<User> usersFromDb = AppLocalDb.db.usersDao().getAllUsers();
 
-            recipes.postValue(makeRecipesForList(postsFromDb,usersFromDb));
+            recipes.postValue(makeRecipesForList(postsFromDb, usersFromDb));
 
             return null;
         }

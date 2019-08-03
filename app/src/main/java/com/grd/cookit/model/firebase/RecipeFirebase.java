@@ -21,6 +21,7 @@ import com.grd.cookit.model.entities.User;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,7 +42,7 @@ public class RecipeFirebase {
         return instance;
     }
 
-    public static void saveImage(File image, String uid, OnSuccessListener<Uri> listener,OnFailureListener onFailureListener) {
+    public static void saveImage(File image, String uid, OnSuccessListener<Uri> listener, OnFailureListener onFailureListener) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
 
         StorageReference imageRef = storage.getReference().child("images").child(uid);
@@ -55,10 +56,10 @@ public class RecipeFirebase {
                 onFailureListener.onFailure(e);
             }
             return imageRef.getDownloadUrl();
-        }).addOnSuccessListener((task)-> {
+        }).addOnSuccessListener((task) -> {
             listener.onSuccess(task);
         })
-        .addOnFailureListener(onFailureListener);
+                .addOnFailureListener(onFailureListener);
     }
 
     public static void saveRecipe(Recipe recipe, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
@@ -68,6 +69,32 @@ public class RecipeFirebase {
                     Log.d(TAG, error.toString());
                     onFailureListener.onFailure(error);
                 });
+    }
+
+    public void updateRecipe(String recipeId,
+                             String newName,
+                             String newDesc,
+                             Uri newFileUri,
+                             OnSuccessListener onSuccessListener,
+                             OnFailureListener onFailureListener) {
+        DatabaseReference recipeRef = FirebaseDatabase.getInstance().getReference();
+        HashMap<String, Object> updateVal = new HashMap<>();
+        updateVal.put("name", newName);
+        updateVal.put("description", newDesc);
+        updateVal.put("imageUri", newFileUri.toString());
+//        HashMap<String, Object> updateOp = new HashMap<>();
+//        updateOp.put("/recipes/" + recipeId, updateVal);
+        recipeRef.child("recipes").child(recipeId).updateChildren(updateVal)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
+
+    }
+
+    public void deleteImage(String imageId, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("images").child(imageId);
+        storageReference.delete()
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
     }
 
     public void getAllCollections(final OnSuccessListener listener) {
