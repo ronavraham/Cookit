@@ -1,9 +1,7 @@
 package com.grd.cookit.repositories;
 
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Pair;
 
@@ -12,7 +10,6 @@ import androidx.lifecycle.MutableLiveData;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
@@ -110,8 +107,12 @@ public class RecipeRepository {
             uiRecipe.timestamp = new Date(recipe.getTimestamp());
             uiRecipe.latitude = recipe.getLatitude();
             uiRecipe.longitude = recipe.getLongitude();
+            uiRecipe.description = recipe.getDescription();
+            uiRecipe.name = recipe.getName();
+            uiRecipe.userGoogleId = recipe.getUserGoogleUid();
+            uiRecipe.imageUri = recipe.getImageUri();
             try {
-                uiRecipe.imagine = new BitmapDrawable(Picasso.get().load(recipe.getImageUri()).get());
+                uiRecipe.recipeImage = new BitmapDrawable(Picasso.get().load(recipe.getImageUri()).get());
             } catch (IOException e) {
                 e.printStackTrace();
             }

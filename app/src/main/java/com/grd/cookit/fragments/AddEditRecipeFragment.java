@@ -1,6 +1,7 @@
 package com.grd.cookit.fragments;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -18,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -30,11 +32,16 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.grd.cookit.R;
+import com.grd.cookit.model.ui.UIRecipe;
 import com.grd.cookit.repositories.RecipeRepository;
+import com.grd.cookit.viewModels.RecipeViewModel;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -52,36 +59,69 @@ public class AddEditRecipeFragment extends Fragment {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
+    @BindView(R.id.recipeImage)
     ImageView imageView;
+    @BindView(R.id.progressBar)
     ProgressBar progressBar;
+    @BindView(R.id.recipeNameEdit)
     EditText editText;
-    File tempFile;
+    @BindView(R.id.descriptionEdit)
     EditText descriptionText;
+    @BindView(R.id.takePictureBtn)
+    Button btnTakePicture;
+    @BindView(R.id.publishBtn)
+    Button btnPublish;
+
+    private String type;
+    private UIRecipe currRecipe;
+    private RecipeViewModel recipeViewModel;
+    private File tempFile;
+
     private boolean locationPermissionGranted;
 
-
     public AddEditRecipeFragment() {
-        // Required empty public constructor
+        recipeViewModel = null;
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        recipeViewModel = RecipeViewModel.instance;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (type.equals("edit")) {
+            recipeViewModel.getselectedRecipe().removeObservers(this);
+        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // change toolbar title
-        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
-        toolbar.setTitle(R.string.add_recipe_title);
-
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_add_edit_recipe, container, false);
-        progressBar = v.findViewById(R.id.progressBar);
-        imageView = v.findViewById(R.id.recipeImage);
-        editText = v.findViewById(R.id.recipeNameEdit);
-        descriptionText = v.findViewById(R.id.descriptionEdit);
-        progressBar.setVisibility(View.INVISIBLE);
+        ButterKnife.bind(this, v);
+            // change toolbar title
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+        progressBar.setVisibility(View.GONE);
 
+        String type = AddEditRecipeFragmentArgs.fromBundle(getArguments()).getType();
+        this.type = type;
 
-        Button btnTakePicture = v.findViewById(R.id.takePictureBtn);
-        Button btnPublish = v.findViewById(R.id.publishBtn);
+        if (type.equals("add")) {
+            toolbar.setTitle(R.string.add_recipe_title);
+
+        } else {
+            toolbar.setTitle(R.string.edit_recipe_title);
+            recipeViewModel.getselectedRecipe().observe(this,(recipe)->{
+                currRecipe = recipe;
+                imageView.setBackgroundDrawable(recipe.recipeImage);
+                editText.setText(recipe.name);
+                descriptionText.setText(recipe.description);
+            });
+        }
 
         btnPublish.setOnClickListener((vi) -> {
             publishRecipe();
@@ -89,7 +129,6 @@ public class AddEditRecipeFragment extends Fragment {
         btnTakePicture.setOnClickListener((vi) -> {
             takePicture();
         });
-
         return v;
     }
 
@@ -142,9 +181,9 @@ public class AddEditRecipeFragment extends Fragment {
                 Toast.makeText(getActivity(), "succeed", Toast.LENGTH_SHORT).show();
                 NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
                 navController.popBackStack();
-            },(error)->{
+            }, (error) -> {
                 progressBar.setVisibility(View.INVISIBLE);
-                Toast.makeText(getActivity(),R.string.general_error_message,Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.general_error_message, Toast.LENGTH_SHORT).show();
             });
         });
     }

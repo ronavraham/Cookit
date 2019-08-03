@@ -15,6 +15,7 @@ public class RecipeViewModel extends ViewModel {
     public static final RecipeViewModel instance = new RecipeViewModel();
 
     public LiveData<List<UIRecipe>> recipes;
+    public MutableLiveData<UIRecipe> selectedRecipe;
     public LiveData<List<UIRecipe>> recipesForProfile;
     private boolean isRecipesBinded = false;
     private boolean isProfileBinded = false;
@@ -25,6 +26,7 @@ public class RecipeViewModel extends ViewModel {
         super();
         profileBusy = new MutableLiveData<>();
         feedBusy = new MutableLiveData<>();
+        selectedRecipe = new MutableLiveData<>();
 
         profileBusy.setValue(false);
         feedBusy.setValue(false);
@@ -52,6 +54,14 @@ public class RecipeViewModel extends ViewModel {
     public void deletePost(String postUid) {
         RecipeRepository.instance.deleteRecipe(postUid);
         updateBusy();
+    }
+
+    public MutableLiveData<UIRecipe> getselectedRecipe(){
+        return this.selectedRecipe;
+    }
+
+    public void selectRecipe(UIRecipe recipe){
+        this.selectedRecipe.setValue(recipe);
     }
 
     private void updateBusy() {

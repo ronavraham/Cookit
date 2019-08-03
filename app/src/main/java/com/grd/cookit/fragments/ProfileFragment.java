@@ -6,11 +6,13 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,11 +65,23 @@ public class ProfileFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext());
         recyclerView.setLayoutManager(layoutManager);
-        postAdapter = new PostAdapter(currRecipes);
 
-        postAdapter.deletePostListener = item -> {
-            postViewModel.deletePost(item.postUid);
-        };
+        postAdapter = new PostAdapter(getContext(),
+                currRecipes,
+                FirebaseAuth.getInstance().getCurrentUser().getUid(),
+                new PostAdapter.OnItemClickListener() {
+                    @Override
+                    public void onDeleteClick(View v, int position) {
+                        postViewModel.deletePost(currRecipes.get(position).uid);
+                    }
+
+                    @Override
+                    public void onInfoClick(View v, int position) {
+                        postViewModel.selectRecipe(currRecipes.get(position));
+                        Navigation.findNavController(getView()).navigate(R.id.action_profileFragment_to_recipeInfoFragment);
+                    }
+                });
+
 
         turnOffProgressBar();
 

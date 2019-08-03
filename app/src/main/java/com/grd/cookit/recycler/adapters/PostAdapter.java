@@ -3,6 +3,8 @@ package com.grd.cookit.recycler.adapters;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,12 +19,20 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
 import com.grd.cookit.model.ui.UIRecipe;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostHolder> {
 
+//    public List<UIRecipe> Posts;
+
+//    public OnItemClickListener deletePostListener;
+//    public OnItemClickListener infoRecipeListener;
+
+    private Context mContext;
     public List<UIRecipe> Posts;
-    public OnItemClickListener deletePostListener;
+    public static OnItemClickListener onItemClickListener;
+    private String userId;
 
     public PostAdapter(List<UIRecipe> posts) {
         if (posts == null) {
@@ -30,16 +40,14 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostHolder> {
         } else {
             Posts = posts;
         }
-        deletePostListener = null;
+        onItemClickListener = null;
     }
 
-    public PostAdapter(List<UIRecipe> posts, OnItemClickListener deletePostListener) {
-        if (posts == null) {
-            Posts = new LinkedList<>();
-        } else {
-            Posts = posts;
-        }
-        deletePostListener = deletePostListener;
+    public PostAdapter(Context context, List<UIRecipe> posts,String userId ,OnItemClickListener onItemClickListener) {
+        this.mContext = context;
+        this.Posts = posts;
+        this.userId = userId;
+        this.onItemClickListener = onItemClickListener;
     }
 
     @NonNull
@@ -50,7 +58,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostHolder> {
 
         PostHolder ph = new PostHolder(v);
 
-
         return ph;
     }
 
@@ -58,13 +65,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostHolder> {
     public void onBindViewHolder(@NonNull PostHolder holder, int position) {
         UIRecipe currentPost = this.Posts.get(position);
         holder.postUid = currentPost.uid;
-        holder.Background.setBackgroundDrawable(currentPost.imagine);
+        holder.Background.setBackgroundDrawable(currentPost.recipeImage);
         holder.PostText.setText(currentPost.name);
         holder.ProfileImage.setImageDrawable(currentPost.userProfileImage);
         holder.Timestamp.setText(new PrettyTime().format(currentPost.timestamp));
         holder.UserName.setText(currentPost.userName);
-        if (this.deletePostListener != null) {
-            holder.Bind(holder, this.deletePostListener);
+        if(!currentPost.userGoogleId.equals(this.userId)){
+            holder.RemoveButton.setVisibility(View.GONE);
         }
     }
 
@@ -74,7 +81,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostHolder> {
     }
 
     public interface OnItemClickListener {
-        void onItemClick(PostHolder item);
+        void onDeleteClick(View v, int position);
+
+        void onInfoClick(View v, int position);
     }
 
     public static class PostHolder extends RecyclerView.ViewHolder {
@@ -85,6 +94,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostHolder> {
         public AppCompatImageView Background;
         public TextView PostText;
         public IconicsButton RemoveButton;
+        public IconicsButton InfoButton;
         public String postUid;
 
         public PostHolder(View itemView) {
@@ -95,17 +105,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostHolder> {
             Background = itemView.findViewById(R.id.post_backround);
             PostText = itemView.findViewById(R.id.post_text);
             RemoveButton = itemView.findViewById(R.id.remove_post_button);
-            RemoveButton.setVisibility(View.INVISIBLE);
-        }
+            InfoButton = itemView.findViewById(R.id.info_post_button);
+            RemoveButton.setOnClickListener(v -> onItemClickListener.onDeleteClick(v, getAdapterPosition()));
 
-        public void Bind(PostHolder holder, OnItemClickListener listener) {
-            holder.RemoveButton.setVisibility(View.VISIBLE);
-            holder.RemoveButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    listener.onItemClick(holder);
-                }
-            });
+            InfoButton.setOnClickListener(v -> onItemClickListener.onInfoClick(v, getAdapterPosition()));
         }
     }
 
