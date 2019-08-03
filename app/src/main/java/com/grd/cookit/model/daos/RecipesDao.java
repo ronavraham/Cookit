@@ -1,6 +1,7 @@
 package com.grd.cookit.model.daos;
 
 import androidx.room.Dao;
+import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
 
@@ -12,18 +13,21 @@ import static androidx.room.OnConflictStrategy.REPLACE;
 
 @Dao
 public interface RecipesDao {
-    @Query("SELECT * FROM Recipe")
-    List<Recipe> getAllPosts();
+    @Query("SELECT * FROM Recipe ORDER BY timestamp DESC")
+    List<Recipe> getAllRecipes();
 
-    @Query("SELECT * FROM Recipe WHERE Uid = :uid")
-    Recipe GetPostByUid(String uid);
-
-    @Insert(onConflict = REPLACE)
-    void insertPost(Recipe post);
+    @Query("SELECT * FROM Recipe WHERE Uid = :uid ORDER BY timestamp DESC")
+    Recipe getRecipeById(String uid);
 
     @Insert(onConflict = REPLACE)
-    void insertAllPosts(Recipe... posts);
+    void insertRecipe(Recipe post);
+
+    @Insert(onConflict = REPLACE)
+    void insertAllRecipes(Recipe... posts);
+
+    @Query("DELETE FROM Recipe")
+    void deleteAllRecipes();
 
     @Query("DELETE FROM Recipe WHERE Uid = :uid")
-    void deletePost(String uid);
+    void deleteRecipe(String uid);
 }
