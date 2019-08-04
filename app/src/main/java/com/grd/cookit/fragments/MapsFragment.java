@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -33,7 +34,7 @@ import com.grd.cookit.model.ui.UIRecipe;
 import com.grd.cookit.viewModels.RecipeViewModel;
 
 
-public class MapsFragment extends Fragment implements OnMapReadyCallback {
+public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
@@ -98,6 +99,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private void initMap() {
         mMap.clear();
         mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
+        mMap.setOnInfoWindowClickListener(this);
         getLocationPermission();
         if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -153,6 +155,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         }
     }
 
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        UIRecipe recipe = (UIRecipe) marker.getTag();
+
+        if (recipe != null) {
+            recipeViewModel.selectRecipe(recipe);
+            Navigation.findNavController(getView()).navigate(R.id.action_mapsFragment_to_recipeInfoFragment);
+        }
+    }
+
     class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 
         // These are both viewgroups containing an ImageView with id "badge" and two TextViews with id
@@ -185,7 +197,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
             TextView titleUi = ((TextView) view.findViewById(R.id.title));
             ImageView img = ((ImageView) view.findViewById(R.id.badge));
 
-            img.setImageDrawable(scaleImage(recipe.image, 0.3f));
+            img.setImageDrawable(scaleImage(recipe.recipeImage, 0.3f));
             titleUi.setText(recipe.name);
         }
 
