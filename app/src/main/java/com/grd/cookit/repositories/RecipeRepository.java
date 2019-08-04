@@ -130,6 +130,7 @@ public class RecipeRepository {
             User user = optUser.get();
 
             UIRecipe uiRecipe = new UIRecipe();
+            uiRecipe.name = recipe.getName();
             uiRecipe.uid = recipe.getUid();
             uiRecipe.userName = user.getName();
             uiRecipe.timestamp = new Date(recipe.getTimestamp());
