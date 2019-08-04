@@ -113,13 +113,17 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (id) {
             case R.id.navigate_to_maps:
-                navController.navigate(R.id.action_homeFragment_to_mapsFragment);
+                navController.navigate(R.id.action_feedFragment_to_mapsFragment);
                 break;
 
             case R.id.navigate_to_add_recipe:
-                navController.navigate(R.id.action_homeFragment_to_addEditRecipeFragment);
+                navController.navigate(R.id.action_feedFragment_to_addEditRecipeFragment);
                 break;
 
+            case R.id.navigate_to_user_profile:
+                navController.navigate(R.id.action_feedFragment_to_profileFragment);
+                break;
+        }
 //            case R.id.navigate_to_logout:
 //                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
 //                firebaseAuth.signOut();
@@ -129,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements
 //                break;
 
 
-        }
+
         return true;
 
     }

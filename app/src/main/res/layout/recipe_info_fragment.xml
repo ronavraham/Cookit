@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    tools:context=".fragments.RecipeInfoFragment"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+<androidx.appcompat.widget.LinearLayoutCompat
+    android:id="@+id/info_profile_bar"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:orientation="horizontal">
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/info_profile_image"
+        android:layout_gravity="center"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginLeft="5dp"
+        android:background="@drawable/outline_perm_identity_black_48dp"/>
+
+    <TextView
+        android:id="@+id/post_user_name"
+        android:layout_gravity="center"
+        android:textStyle="bold"
+        android:layout_marginLeft="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nir Haviv" />
+
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/post_time_ago"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:layout_gravity="center"
+        android:text="A minute ago"
+        android:layout_weight="1"
+        android:layout_marginRight="5dp"/>
+
+    <com.mikepenz.iconics.view.IconicsButton
+        android:id="@+id/edit_recipe_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:textAlignment="center"
+        android:gravity="end"
+        android:layout_gravity="center"
+        android:background="@drawable/ic_edit_black_24dp"
+        android:layout_marginLeft="5dp">
+    </com.mikepenz.iconics.view.IconicsButton>
+
+    <com.mikepenz.iconics.view.IconicsButton
+        android:id="@+id/remove_recipe_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:textAlignment="center"
+        android:gravity="end"
+        android:layout_gravity="center"
+        android:background="@drawable/outline_delete_black_48dp"
+        android:layout_marginLeft="5dp">
+    </com.mikepenz.iconics.view.IconicsButton>
+</androidx.appcompat.widget.LinearLayoutCompat>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/recipe_name"
+        android:paddingEnd="8dp"
+        android:textStyle="bold"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/recipe_info_name"
+            android:text="recipe name"/>
+
+    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/recipe_description"
+        android:textStyle="bold"
+        android:paddingTop="12dp"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/recipe_info_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine" />
+
+<ImageView
+android:id="@+id/info_recipe_image"
+android:layout_width="match_parent"
+android:layout_height="400dp"
+android:scaleType="centerCrop"/>
+
+
+</LinearLayout>

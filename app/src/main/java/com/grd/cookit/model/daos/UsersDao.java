@@ -25,6 +25,9 @@ public interface UsersDao {
     @Delete
     void deleteUser(User user);
 
+    @Query("DELETE FROM User")
+    void deleteAllUsers();
+
     @Insert(onConflict = REPLACE)
     void insertAllUsers(User... u);
 }

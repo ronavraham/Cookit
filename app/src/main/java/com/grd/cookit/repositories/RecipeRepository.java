@@ -2,6 +2,7 @@ package com.grd.cookit.repositories;
 
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Pair;
 
@@ -34,9 +35,11 @@ import java.util.stream.Collectors;
 public class RecipeRepository {
     public static final RecipeRepository instance = new RecipeRepository();
     public MutableLiveData<List<UIRecipe>> recipes;
+    public MutableLiveData<List<UIRecipe>> recipesForUser;
 
     RecipeRepository() {
         recipes = new MutableLiveData<>();
+        recipesForUser = new MutableLiveData<>();
     }
 
     public LiveData<List<UIRecipe>> getAllRecipes() {
@@ -48,6 +51,15 @@ public class RecipeRepository {
         return this.recipes;
     }
 
+    public LiveData<List<UIRecipe>> getAllRecipesForProfile(String uid) {
+        synchronized (this) {
+            AsyncTask task = new GetAllRecipesForProfileTask();
+            task.execute(new String[]{uid});
+        }
+
+        return this.recipesForUser;
+    }
+
     public static void saveRecipe(String recipeName,
                                   String description,
                                   File image,
@@ -57,31 +69,58 @@ public class RecipeRepository {
         Tasks.call(Executors.newSingleThreadExecutor(), () -> {
             Recipe recipe = new Recipe();
             String uid = UUID.randomUUID().toString();
-            recipe.uid = uid;
-            recipe.userGoogleUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-            recipe.timestamp = new Date().getTime();
-            recipe.name = recipeName;
-            recipe.description = description;
-            recipe.longitude = location.getLongitude();
-            recipe.latitude = location.getLatitude();
+            recipe.setUid(uid);
+            recipe.setUserGoogleUid(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            recipe.setTimestamp(new Date().getTime());
+            recipe.setName(recipeName);
+            recipe.setDescription(description);
+            recipe.setLongitude(location.getLongitude());
+            recipe.setLatitude(location.getLatitude());
 
             RecipeFirebase.saveImage(image, uid, (newImageUrl) -> {
-                recipe.imageUri = newImageUrl.toString();
-                RecipeFirebase.saveRecipe(recipe, onSuccessListener,onFailureListener);
-            },onFailureListener);
+                recipe.setImageUri(newImageUrl.toString());
+                RecipeFirebase.saveRecipe(recipe, onSuccessListener, onFailureListener);
+            }, onFailureListener);
             return null;
         });
 
     }
 
-    private List<UIRecipe> makePostsForList(List<Recipe> recipes, List<User> users) {
+    public void updateRecipe(String recipeId,
+                             Uri oldFile,
+                             File newFile,
+                             String newName,
+                             String newDesc,
+                             OnSuccessListener onSuccessListener,
+                             OnFailureListener onFailureListener) {
+        Tasks.call(Executors.newSingleThreadExecutor(), () -> {
+            Uri newFileUri = oldFile;
+            if (newFile == null) {
+                RecipeFirebase.getInstance().updateRecipe(recipeId, newName, newDesc, newFileUri, onSuccessListener, onFailureListener);
+            } else {
+                RecipeFirebase.getInstance().deleteImage(recipeId, (e) -> {
+                    RecipeFirebase.getInstance().saveImage(newFile, recipeId, (newImageUrl) -> {
+                        RecipeFirebase.getInstance().updateRecipe(recipeId,
+                                newName,
+                                newDesc,
+                                newImageUrl,
+                                onSuccessListener,
+                                onFailureListener);
+                    }, onFailureListener);
+                }, onFailureListener);
+            }
+            return null;
+        });
+    }
+
+    private List<UIRecipe> makeRecipesForList(List<Recipe> recipes, List<User> users) {
         List<UIRecipe> result = new ArrayList<>();
 
         List<UIRecipe> finalResult = result;
 
         recipes.stream().forEach((recipe) -> {
             Optional<User> optUser = users.stream().filter(
-                    (user1) -> user1.getGoogleUid().equals(recipe.userGoogleUid))
+                    (user1) -> user1.getGoogleUid().equals(recipe.getUserGoogleUid()))
                     .findAny();
 
             if (!optUser.isPresent()) {
@@ -94,11 +133,15 @@ public class RecipeRepository {
             uiRecipe.name = recipe.name;
             uiRecipe.uid = recipe.uid;
             uiRecipe.userName = user.getName();
-            uiRecipe.timestamp = new Date(recipe.timestamp);
-            uiRecipe.latitude = recipe.latitude;
-            uiRecipe.longitude = recipe.longitude;
+            uiRecipe.timestamp = new Date(recipe.getTimestamp());
+            uiRecipe.latitude = recipe.getLatitude();
+            uiRecipe.longitude = recipe.getLongitude();
+            uiRecipe.description = recipe.getDescription();
+            uiRecipe.name = recipe.getName();
+            uiRecipe.userGoogleId = recipe.getUserGoogleUid();
+            uiRecipe.imageUri = recipe.getImageUri();
             try {
-                uiRecipe.image = new BitmapDrawable(Picasso.get().load(recipe.imageUri).get());
+                uiRecipe.recipeImage = new BitmapDrawable(Picasso.get().load(recipe.getImageUri()).get());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -116,6 +159,12 @@ public class RecipeRepository {
         return result;
     }
 
+    private List<UIRecipe> makeRecipesForList(List<Recipe> posts, User user) {
+        List<User> userList = new ArrayList<>();
+        userList.add(user);
+        return makeRecipesForList(posts, userList);
+    }
+
     private class GetAllRecipesTask extends AsyncTask<String, String, List<UIRecipe>> {
 
         @Override
@@ -127,20 +176,62 @@ public class RecipeRepository {
                     Pair<List<Recipe>, List<User>> tuple = (Pair<List<Recipe>, List<User>>) pair;
                     List<Recipe> posts = tuple.first;
                     List<User> users = tuple.second;
-                    List<UIRecipe> result = makePostsForList(posts, users);
+                    List<UIRecipe> result = makeRecipesForList(posts, users);
                     recipes.postValue(result);
 
+                    AppLocalDb.db.recipesDao().deleteAllRecipes();
+                    AppLocalDb.db.usersDao().deleteAllUsers();
+
                     AppLocalDb.db.usersDao().insertAllUsers(users.toArray(new User[0]));
-                    AppLocalDb.db.recipesDao().insertAllPosts(posts.toArray(new Recipe[0]));
+                    AppLocalDb.db.recipesDao().insertAllRecipes(posts.toArray(new Recipe[0]));
                     return true;
                 });
             });
 
-            List<Recipe> postsFromDb = AppLocalDb.db.recipesDao().getAllPosts();
+            List<Recipe> postsFromDb = AppLocalDb.db.recipesDao().getAllRecipes();
             List<User> usersFromDb = AppLocalDb.db.usersDao().getAllUsers();
+
+            recipes.postValue(makeRecipesForList(postsFromDb, usersFromDb));
 
             return null;
         }
+    }
+
+    private class GetAllRecipesForProfileTask extends AsyncTask<String, Void, List<UIRecipe>> {
+        @Override
+        protected List<UIRecipe> doInBackground(String... uid) {
+            final TaskCompletionSource<Pair<List<Recipe>, User>> source = new TaskCompletionSource<>();
+
+            RecipeFirebase.getInstance().getAllCollectionsForProfile(uid[0], (pair) -> {
+                Tasks.call(Executors.newSingleThreadExecutor(), () -> {
+                    Pair<List<Recipe>, User> tuple = (Pair<List<Recipe>, User>) pair;
+                    List<Recipe> posts = tuple.first;
+                    User user = tuple.second;
+                    List<UIRecipe> result = makeRecipesForList(posts, user);
+                    recipesForUser.postValue(result);
+
+                    AppLocalDb.db.usersDao().insertAllUsers(user);
+                    AppLocalDb.db.recipesDao().insertAllRecipes(posts.toArray(new Recipe[0]));
+
+                    return true;
+                });
+            });
+
+            List<Recipe> postsFromDb = AppLocalDb.db.recipesDao().getAllRecipes();
+            User usersFromDb = AppLocalDb.db.usersDao().getUserByUid(uid[0]);
+
+            recipesForUser.postValue(makeRecipesForList(postsFromDb, usersFromDb));
+
+            return null;
+        }
+    }
+
+    public void deleteRecipe(String postUid) {
+        Tasks.call(Executors.newSingleThreadExecutor(), () -> {
+            RecipeFirebase.getInstance().deletePost(postUid);
+            AppLocalDb.db.recipesDao().deleteRecipe(postUid);
+            return true;
+        });
     }
 
 }

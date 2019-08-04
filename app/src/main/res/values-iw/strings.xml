@@ -12,4 +12,10 @@
     <string name="drawer_map">מפה</string>
     <string name="drawer_add_recipe">הוסף מתכון</string>
     <string name="drawer_logout">התנתק</string>
+    <string name="feed_title">פיד</string>
+    <string name="profile_title">פרופיל</string>
+    <string name="recipe_info_title">פרטי מתכון</string>
+    <string name="title_activity_maps">מפה</string>
+    <string name="map_title">מפה</string>
+    <string name="edit_recipe_title">עדכן מתכון</string>
 </resources>

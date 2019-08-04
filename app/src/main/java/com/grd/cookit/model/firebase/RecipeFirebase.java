@@ -21,12 +21,15 @@ import com.grd.cookit.model.entities.User;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class RecipeFirebase {
     private static RecipeFirebase instance = null;
     private static final String TAG = "RecipeFirebase";
     ValueEventListener allCollectionseventListener;
+    ValueEventListener profileEventListener;
 
 
     protected RecipeFirebase() {
@@ -39,7 +42,7 @@ public class RecipeFirebase {
         return instance;
     }
 
-    public static void saveImage(File image, String uid, OnSuccessListener<Uri> listener,OnFailureListener onFailureListener) {
+    public static void saveImage(File image, String uid, OnSuccessListener<Uri> listener, OnFailureListener onFailureListener) {
         FirebaseStorage storage = FirebaseStorage.getInstance();
 
         StorageReference imageRef = storage.getReference().child("images").child(uid);
@@ -53,19 +56,45 @@ public class RecipeFirebase {
                 onFailureListener.onFailure(e);
             }
             return imageRef.getDownloadUrl();
-        }).addOnSuccessListener((task)-> {
+        }).addOnSuccessListener((task) -> {
             listener.onSuccess(task);
         })
-        .addOnFailureListener(onFailureListener);
+                .addOnFailureListener(onFailureListener);
     }
 
     public static void saveRecipe(Recipe recipe, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
         DatabaseReference mdatabase = FirebaseDatabase.getInstance().getReference();
-        mdatabase.child("recipes").child(recipe.uid).setValue(recipe).addOnSuccessListener(onSuccessListener)
+        mdatabase.child("recipes").child(recipe.getUid()).setValue(recipe).addOnSuccessListener(onSuccessListener)
                 .addOnFailureListener((error) -> {
                     Log.d(TAG, error.toString());
                     onFailureListener.onFailure(error);
                 });
+    }
+
+    public void updateRecipe(String recipeId,
+                             String newName,
+                             String newDesc,
+                             Uri newFileUri,
+                             OnSuccessListener onSuccessListener,
+                             OnFailureListener onFailureListener) {
+        DatabaseReference recipeRef = FirebaseDatabase.getInstance().getReference();
+        HashMap<String, Object> updateVal = new HashMap<>();
+        updateVal.put("name", newName);
+        updateVal.put("description", newDesc);
+        updateVal.put("imageUri", newFileUri.toString());
+//        HashMap<String, Object> updateOp = new HashMap<>();
+//        updateOp.put("/recipes/" + recipeId, updateVal);
+        recipeRef.child("recipes").child(recipeId).updateChildren(updateVal)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
+
+    }
+
+    public void deleteImage(String imageId, OnSuccessListener onSuccessListener, OnFailureListener onFailureListener) {
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("images").child(imageId);
+        storageReference.delete()
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener);
     }
 
     public void getAllCollections(final OnSuccessListener listener) {
@@ -98,6 +127,52 @@ public class RecipeFirebase {
                 }
             });
         }
+    }
+
+    public void getAllCollectionsForProfile(String userUid, final OnSuccessListener listener) {
+        DatabaseReference fbPostsRef = FirebaseDatabase.getInstance().getReference();
+        if (profileEventListener == null) {
+            profileEventListener = fbPostsRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                    DataSnapshot postsRef = dataSnapshot.child("recipes");
+                    DataSnapshot usersRef = dataSnapshot.child("users");
+                    List<User> users = new ArrayList<>();
+                    List<Recipe> recipes = new ArrayList<>();
+
+                    for (DataSnapshot postSnapshot : postsRef.getChildren()) {
+                        Recipe r = postSnapshot.getValue(Recipe.class);
+                        recipes.add(r);
+                    }
+
+                    for (DataSnapshot postSnapshot : usersRef.getChildren()) {
+                        User u = postSnapshot.getValue(User.class);
+                        users.add(u);
+                    }
+
+                    recipes = recipes.stream().filter(post -> post.getUserGoogleUid().equals(userUid)).collect(Collectors.toList());
+                    User user = users.stream().filter(currUser -> currUser.googleUid.equals(userUid)).findFirst().get();
+
+                    listener.onSuccess(new Pair(recipes, user));
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    listener.onSuccess(null);
+                }
+            });
+        }
+    }
+
+    public void deletePost(String postUid) {
+        // delete post image
+        // delete post itself
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        StorageReference imagesRef = storage.getReference().child("images").child(postUid);
+        imagesRef.delete();
+        FirebaseDatabase.getInstance().getReference()
+                .child("recipes").child(postUid).setValue(null);
+
     }
 
 }

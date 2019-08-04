@@ -1,6 +1,7 @@
 package com.grd.cookit.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.grd.cookit.MainActivity;
 import com.grd.cookit.R;
 import com.grd.cookit.activities.AuthActivity;
 import com.grd.cookit.model.entities.User;
@@ -53,6 +55,9 @@ public class AuthFragment extends Fragment {
                 User newUser = new User(FirebaseAuth.getInstance().getCurrentUser());
 
                 userViewModel.saveUser(newUser);
+
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                startActivity(intent);
             }
         }, getActivity());
     }

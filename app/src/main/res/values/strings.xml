@@ -25,4 +25,9 @@
     <string name="drawer_map">Map</string>
     <string name="drawer_add_recipe">Add recipe</string>
     <string name="drawer_logout">Logout</string>
+    <string name="feed_title">Feed</string>
+    <string name="profile_title">Profile</string>
+    <string name="recipe_info_title">Recipe info</string>
+    <string name="map_title">Map</string>
+    <string name="edit_recipe_title">edit recipe</string>
 </resources>
