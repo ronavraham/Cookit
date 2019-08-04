@@ -2,11 +2,16 @@ package com.grd.cookit.fragments;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -19,9 +24,12 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.grd.cookit.R;
+import com.grd.cookit.model.ui.UIRecipe;
 import com.grd.cookit.viewModels.RecipeViewModel;
 
 
@@ -31,6 +39,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private FusedLocationProviderClient fusedLocationClient;
     private final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean locationPermissionGranted;
+    private Location currentLocation;
     private RecipeViewModel recipeViewModel;
 
     public MapsFragment() {
@@ -64,19 +73,31 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         recipeViewModel.getAllRecipes().observe(this, recipes -> {
             mMap.clear();
+
+            if (currentLocation != null) {
+                LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+                mMap.addMarker(new MarkerOptions()
+                        .position(latLng)
+                        .draggable(true)
+                        .title("Current Location"))
+                        .setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+            }
+
             recipes.forEach(recipe -> {
                 LatLng latLng = new LatLng(recipe.latitude, recipe.longitude);
 
                 mMap.addMarker(new MarkerOptions()
                         .position(latLng)
                         .draggable(true)
-                        .title(recipe.name));
+                        .title(recipe.name))
+                        .setTag(recipe);
             });
         });
     }
 
     private void initMap() {
         mMap.clear();
+        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
         getLocationPermission();
         if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
@@ -86,6 +107,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 .addOnSuccessListener(getActivity(), location -> {
                     // Got last known location. In some rare situations, this can be null.
                     if (location != null) {
+                        currentLocation = location;
                         moveMap(location);
                     }
                 });
@@ -99,11 +121,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
          * move the camera with animation
          */
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        mMap.addMarker(new MarkerOptions()
-                .position(latLng)
-                .draggable(true)
-                .title("Current Location"));
-
         mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,12));
         mMap.getUiSettings().setZoomControlsEnabled(true);
@@ -133,6 +150,61 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     locationPermissionGranted = true;
                 }
             }
+        }
+    }
+
+    class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+
+        // These are both viewgroups containing an ImageView with id "badge" and two TextViews with id
+        // "title" and "snippet".
+
+        private final View mContents;
+
+        CustomInfoWindowAdapter() {
+            mContents = getLayoutInflater().inflate(R.layout.custom_info_contents, null);
+        }
+
+        @Override
+        public View getInfoWindow(Marker marker) {
+            return null;
+        }
+
+        @Override
+        public View getInfoContents(Marker marker) {
+            if (marker.getTag() != null) {
+                render(marker, mContents);
+                return mContents;
+            }
+
+            return null;
+        }
+
+        private void render(Marker marker, View view) {
+            UIRecipe recipe = (UIRecipe) marker.getTag();
+
+            TextView titleUi = ((TextView) view.findViewById(R.id.title));
+            ImageView img = ((ImageView) view.findViewById(R.id.badge));
+
+            img.setImageDrawable(scaleImage(recipe.image, 0.3f));
+            titleUi.setText(recipe.name);
+        }
+
+        private Drawable scaleImage(Drawable image, float scaleFactor) {
+
+            if ((image == null) || !(image instanceof BitmapDrawable)) {
+                return image;
+            }
+
+            Bitmap b = ((BitmapDrawable)image).getBitmap();
+
+            int sizeX = Math.round(image.getIntrinsicWidth() * scaleFactor);
+            int sizeY = Math.round(image.getIntrinsicHeight() * scaleFactor);
+
+            Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 350, 350, false);
+
+            image = new BitmapDrawable(getResources(), bitmapResized);
+
+            return image;
         }
     }
 }

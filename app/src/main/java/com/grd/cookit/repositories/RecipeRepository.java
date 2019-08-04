@@ -91,13 +91,14 @@ public class RecipeRepository {
             User user = optUser.get();
 
             UIRecipe uiRecipe = new UIRecipe();
+            uiRecipe.name = recipe.name;
             uiRecipe.uid = recipe.uid;
             uiRecipe.userName = user.getName();
             uiRecipe.timestamp = new Date(recipe.timestamp);
             uiRecipe.latitude = recipe.latitude;
             uiRecipe.longitude = recipe.longitude;
             try {
-                uiRecipe.imagine = new BitmapDrawable(Picasso.get().load(recipe.imageUri).get());
+                uiRecipe.image = new BitmapDrawable(Picasso.get().load(recipe.imageUri).get());
             } catch (IOException e) {
                 e.printStackTrace();
             }
