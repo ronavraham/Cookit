@@ -1,6 +1,5 @@
 package com.grd.cookit.viewModels;
 
-import android.graphics.Bitmap;
 import android.net.Uri;
 
 import androidx.lifecycle.LiveData;
@@ -16,8 +15,6 @@ import java.io.File;
 import java.util.List;
 
 public class RecipeViewModel extends ViewModel {
-    public static final RecipeViewModel instance = new RecipeViewModel();
-
     public LiveData<List<UIRecipe>> recipes;
     public MutableLiveData<UIRecipe> selectedRecipe;
     public LiveData<List<UIRecipe>> recipesForProfile;
@@ -26,7 +23,7 @@ public class RecipeViewModel extends ViewModel {
     public MutableLiveData<Boolean> profileBusy;
     public MutableLiveData<Boolean> feedBusy;
 
-    private RecipeViewModel() {
+    public RecipeViewModel() {
         super();
         profileBusy = new MutableLiveData<>();
         feedBusy = new MutableLiveData<>();
