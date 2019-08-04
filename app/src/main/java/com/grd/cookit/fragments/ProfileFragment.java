@@ -2,35 +2,31 @@ package com.grd.cookit.fragments;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import androidx.fragment.app.Fragment;
-import androidx.navigation.NavController;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ProgressBar;
-
-import com.grd.cookit.R;
-// import com.grd.cookit.activities.A;
-import com.grd.cookit.recycler.adapters.PostAdapter;
-import com.grd.cookit.model.ui.UIRecipe;
-import com.grd.cookit.viewModels.RecipeViewModel;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.grd.cookit.R;
+import com.grd.cookit.model.ui.UIRecipe;
+import com.grd.cookit.recycler.adapters.PostAdapter;
+import com.grd.cookit.viewModels.RecipeViewModel;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
+
+// import com.grd.cookit.activities.A;
 
 public class ProfileFragment extends Fragment {
 
@@ -43,7 +39,7 @@ public class ProfileFragment extends Fragment {
     @BindView(R.id.posts_recycler)
     RecyclerView recyclerView;
 
-    private RecipeViewModel postViewModel;
+    private RecipeViewModel recipeViewModel;
     private LinearLayoutManager layoutManager;
     private PostAdapter postAdapter;
     private List<UIRecipe> currRecipes;
@@ -52,6 +48,13 @@ public class ProfileFragment extends Fragment {
 
     public ProfileFragment() {
         currRecipes = null;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        recipeViewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);
+        bindAdapterToLivedata();
     }
 
     @Override
@@ -72,12 +75,12 @@ public class ProfileFragment extends Fragment {
                 new PostAdapter.OnItemClickListener() {
                     @Override
                     public void onDeleteClick(View v, int position) {
-                        postViewModel.deletePost(currRecipes.get(position).uid);
+                        recipeViewModel.deletePost(currRecipes.get(position).uid);
                     }
 
                     @Override
                     public void onInfoClick(View v, int position) {
-                        postViewModel.selectRecipe(currRecipes.get(position));
+                        recipeViewModel.selectRecipe(currRecipes.get(position));
                         Navigation.findNavController(getView()).navigate(R.id.action_profileFragment_to_recipeInfoFragment);
                     }
                 });
@@ -91,18 +94,11 @@ public class ProfileFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        postViewModel = RecipeViewModel.instance;
-        bindAdapterToLivedata();
-    }
-
     private void bindAdapterToLivedata() {
         if (!isBinded) {
             isBinded = true;
 
-            postViewModel.profileBusy.observe(this, (isBusy) -> {
+            recipeViewModel.profileBusy.observe(this, (isBusy) -> {
                 if (isBusy) {
                     turnOnProgressBar();
                 } else {
@@ -110,7 +106,7 @@ public class ProfileFragment extends Fragment {
                 }
             });
 
-            postViewModel.getAllProfilePosts(
+            recipeViewModel.getAllProfilePosts(
                     FirebaseAuth.getInstance().getCurrentUser().getUid()).observe(this, this::updatePosts);
         }
     }
@@ -131,15 +127,15 @@ public class ProfileFragment extends Fragment {
         postAdapter.Posts = posts;
         currRecipes = posts;
         postAdapter.notifyDataSetChanged();
-        postViewModel.profileBusy.setValue(false);
+        recipeViewModel.profileBusy.setValue(false);
         turnOffProgressBar();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        postViewModel.profileBusy.removeObservers(this);
-        postViewModel.recipesForProfile.removeObservers(this);
+        recipeViewModel.profileBusy.removeObservers(this);
+        recipeViewModel.recipesForProfile.removeObservers(this);
         isBinded = false;
     }
 }

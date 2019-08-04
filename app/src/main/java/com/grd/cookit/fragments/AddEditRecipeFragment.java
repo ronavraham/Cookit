@@ -25,6 +25,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
@@ -86,7 +87,7 @@ public class AddEditRecipeFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        recipeViewModel = RecipeViewModel.instance;
+        recipeViewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);;
     }
 
     @Override

@@ -2,14 +2,16 @@ package com.grd.cookit.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
-import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.grd.cookit.R;
@@ -31,7 +33,7 @@ public class FeedFragment extends Fragment {
     RecyclerView recyclerView;
 
     private LinearLayoutManager layoutManager;
-    private RecipeViewModel postViewModel;
+    private RecipeViewModel recipeViewModel;
     private PostAdapter postAdapter;
     private List<UIRecipe> currRecipes;
 
@@ -42,7 +44,7 @@ public class FeedFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        postViewModel = RecipeViewModel.instance;
+        recipeViewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);
     }
 
 
@@ -63,17 +65,17 @@ public class FeedFragment extends Fragment {
                 new PostAdapter.OnItemClickListener() {
                     @Override
                     public void onDeleteClick(View v, int position) {
-                        postViewModel.deletePost(currRecipes.get(position).uid);
+                        recipeViewModel.deletePost(currRecipes.get(position).uid);
                     }
 
                     @Override
                     public void onInfoClick(View v, int position) {
-                        postViewModel.selectRecipe(currRecipes.get(position));
+                        recipeViewModel.selectRecipe(currRecipes.get(position));
                         Navigation.findNavController(getView()).navigate(R.id.action_feedFragment_to_recipeInfoFragment);
                     }
                 });
 
-        postViewModel.feedBusy.observe(this, (isBusy) -> {
+        recipeViewModel.feedBusy.observe(this, (isBusy) -> {
             if (isBusy) {
                 turnOnProgressBar();
             } else {
@@ -89,11 +91,11 @@ public class FeedFragment extends Fragment {
 
     private void bindAdapterToLivedata() {
         turnOnProgressBar();
-        postViewModel.getAllRecipes().observe(this, (posts) -> {
+        recipeViewModel.getAllRecipes().observe(this, (posts) -> {
             postAdapter.Posts = posts;
             currRecipes = posts;
             postAdapter.notifyDataSetChanged();
-            postViewModel.feedBusy.setValue(false);
+            recipeViewModel.feedBusy.setValue(false);
             turnOffProgressBar();
         });
     }
