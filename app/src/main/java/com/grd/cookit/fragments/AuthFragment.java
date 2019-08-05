@@ -30,7 +30,7 @@ public class AuthFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
 
-        userViewModel = ViewModelProviders.of(this).get(UserViewModel.class);
+        userViewModel = ViewModelProviders.of(getActivity()).get(UserViewModel.class);
     }
 
     public AuthFragment() {

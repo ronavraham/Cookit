@@ -44,7 +44,7 @@ public class FeedFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        recipeViewModel = ViewModelProviders.of(this).get(RecipeViewModel.class);
+        recipeViewModel = ViewModelProviders.of(getActivity()).get(RecipeViewModel.class);
     }
 
 
