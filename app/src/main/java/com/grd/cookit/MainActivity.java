@@ -75,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements
 
         drawerLayout = findViewById(R.id.drawer_layout);
 
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+
         navigationView = findViewById(R.id.nav_view);
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
