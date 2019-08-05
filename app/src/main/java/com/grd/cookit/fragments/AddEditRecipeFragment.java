@@ -32,6 +32,7 @@ import androidx.navigation.Navigation;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.grd.cookit.PermissionUtils;
 import com.grd.cookit.R;
 import com.grd.cookit.model.ui.UIRecipe;
 import com.grd.cookit.repositories.RecipeRepository;
@@ -48,13 +49,15 @@ import static android.app.Activity.RESULT_OK;
 
 public class AddEditRecipeFragment extends Fragment {
 
-    private final int REQUEST_IMAGE_CAPTURE = 1;
-    private final int PERMISSION_ALL = 1;
     private static final String TAG = "AddEditRecipeFragment";
     private static final String APP_NAME = "coockit";
-    private final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
+    private static final int REQUEST_IMAGE_CAPTURE = 0;
 
-    private static String[] PERMISSIONS = {
+    // permission section
+    private static final int REQUEST_CAMERA_AND_STORAGE = 0;
+    private static final int REQUEST_CURRENT_LOCATION = 1;
+
+    private static String[] CAMERA_AND_STORAGE_PERMISSION = {
             Manifest.permission.CAMERA,
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -78,8 +81,6 @@ public class AddEditRecipeFragment extends Fragment {
     private RecipeViewModel recipeViewModel;
     private File tempFile;
 
-    private boolean locationPermissionGranted;
-
     public AddEditRecipeFragment() {
         recipeViewModel = null;
     }
@@ -87,7 +88,8 @@ public class AddEditRecipeFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        recipeViewModel = ViewModelProviders.of(getActivity()).get(RecipeViewModel.class);;
+        recipeViewModel = ViewModelProviders.of(getActivity()).get(RecipeViewModel.class);
+        ;
     }
 
     @Override
@@ -114,9 +116,7 @@ public class AddEditRecipeFragment extends Fragment {
         if (type.equals("add")) {
             toolbar.setTitle(R.string.add_recipe_title);
 
-            btnPublish.setOnClickListener((vi) -> {
-                publishRecipe();
-            });
+            btnPublish.setOnClickListener((vi) -> publishRecipe());
 
         } else {
             toolbar.setTitle(R.string.edit_recipe_title);
@@ -127,20 +127,21 @@ public class AddEditRecipeFragment extends Fragment {
                 descriptionText.setText(recipe.description);
             });
 
-            btnPublish.setOnClickListener(vi -> {
-                updateRecipe();
-            });
+            btnPublish.setOnClickListener(vi -> updateRecipe());
         }
 
-        btnTakePicture.setOnClickListener((vi) -> {
-            takePicture();
-        });
+        btnTakePicture.setOnClickListener((vi) -> takePicture());
         return v;
     }
 
     public void takePicture() {
         Log.d(TAG, "takePicture: check if app has permissions");
-        if (hasPermissions()) {
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED&&
+                ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                        == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "takePicture: start camera activity");
             Intent takePictureIntent = new Intent(
                     MediaStore.ACTION_IMAGE_CAPTURE);
@@ -156,7 +157,28 @@ public class AddEditRecipeFragment extends Fragment {
             }
         } else {
             Log.d(TAG, "takePicture: ask user for permissions");
-            ActivityCompat.requestPermissions(getActivity(), PERMISSIONS, PERMISSION_ALL);
+            requestPermissions(CAMERA_AND_STORAGE_PERMISSION, REQUEST_CAMERA_AND_STORAGE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        // in case asked for camera and storage
+        if (requestCode == REQUEST_CAMERA_AND_STORAGE) {
+            if(PermissionUtils.verifyPermissions(grantResults)){
+                // in case all permission granted
+                takePicture();
+            }else{
+                Toast.makeText(getActivity(),R.string.ask_camera_and_storage_permission,Toast.LENGTH_LONG).show();
+            }
+        } else if (requestCode == REQUEST_CURRENT_LOCATION) {
+            if(PermissionUtils.verifyPermissions(grantResults)){
+                publishRecipe();
+            }else{
+                Toast.makeText(getActivity(),R.string.ask_location_permission,Toast.LENGTH_LONG).show();
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
@@ -196,27 +218,24 @@ public class AddEditRecipeFragment extends Fragment {
     }
 
     public void publishRecipe() {
+        if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED){
         progressBar.setVisibility(View.VISIBLE);
-        getPhoneLocation((location) -> {
-            RecipeRepository.saveRecipe(editText.getText().toString(), descriptionText.getText().toString(), tempFile, location, (e) -> {
-                progressBar.setVisibility(View.INVISIBLE);
-                Toast.makeText(getActivity(), "succeed", Toast.LENGTH_SHORT).show();
-                NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
-                navController.popBackStack();
-            }, (error) -> {
-                progressBar.setVisibility(View.INVISIBLE);
-                Toast.makeText(getActivity(), R.string.general_error_message, Toast.LENGTH_SHORT).show();
+            getPhoneLocation((location) -> {
+                RecipeRepository.saveRecipe(editText.getText().toString(), descriptionText.getText().toString(), tempFile, location, (e) -> {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    Toast.makeText(getActivity(), "succeed", Toast.LENGTH_SHORT).show();
+                    NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+                    navController.popBackStack();
+                }, (error) -> {
+                    progressBar.setVisibility(View.INVISIBLE);
+                    Toast.makeText(getActivity(), R.string.general_error_message, Toast.LENGTH_SHORT).show();
+                });
             });
-        });
-    }
-
-    private boolean hasPermissions() {
-        for (String permission : PERMISSIONS) {
-            if (ActivityCompat.checkSelfPermission(getActivity(), permission) != PackageManager.PERMISSION_GRANTED) {
-                return false;
-            }
+        }else{
+            requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    REQUEST_CURRENT_LOCATION);
         }
-        return true;
     }
 
     private File createTmpFile() {
@@ -269,23 +288,10 @@ public class AddEditRecipeFragment extends Fragment {
     }
 
     private void getPhoneLocation(OnSuccessListener<Location> listener) {
-        getLocationPermission();
         if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         fusedLocationClient.getLastLocation().addOnSuccessListener(listener);
-    }
-
-    private void getLocationPermission() {
-        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            locationPermissionGranted = true;
-        } else {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }
     }
 }

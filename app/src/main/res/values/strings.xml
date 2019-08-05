@@ -30,4 +30,6 @@
     <string name="recipe_info_title">Recipe info</string>
     <string name="map_title">Map</string>
     <string name="edit_recipe_title">edit recipe</string>
+    <string name="ask_camera_and_storage_permission">To take picture the app need permission for camera and stoarge</string>
+    <string name="ask_location_permission">To publish the recipe, the app need your phone location</string>
 </resources>
