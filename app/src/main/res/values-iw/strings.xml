@@ -18,4 +18,7 @@
     <string name="title_activity_maps">מפה</string>
     <string name="map_title">מפה</string>
     <string name="edit_recipe_title">עדכן מתכון</string>
+    <string name="ask_camera_and_storage_permission">על מנת לצלם האפליקציה צריכה הרשאות למצלמה ולאחסון</string>
+    <string name="ask_location_permission">על מנת לפרסם את המתכון, האפליקציה צריכה את מיקום הפאלפון שלך</string>
+    <string name="ask_current_location_map_permission">האפליקציה צריכה את הרשאתך כדי להראות את מיקומך</string>
 </resources>
