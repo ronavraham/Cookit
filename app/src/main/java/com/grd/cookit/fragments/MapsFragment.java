@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -26,13 +27,19 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.grd.cookit.PermissionUtils;
 import com.grd.cookit.R;
 import com.grd.cookit.model.ui.UIRecipe;
 import com.grd.cookit.viewModels.RecipeViewModel;
+import com.mikepenz.iconics.view.IconicsButton;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
 
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
@@ -40,9 +47,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
     private final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private boolean locationPermissionGranted;
     private Location currentLocation;
     private RecipeViewModel recipeViewModel;
+
+    @BindView(R.id.current_location_btn)
+    IconicsButton currentLocationBtn;
 
     public MapsFragment() {
         // Required empty public constructor
@@ -58,13 +67,32 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_maps, container, false);
+        ButterKnife.bind(this, v);
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
+        currentLocationBtn.setOnClickListener(v1 -> getCurrentLocation());
         mapFragment.getMapAsync(this);
 
         // Inflate the layout for this fragment
         return v;
+    }
+
+    private void getCurrentLocation() {
+        if (currentLocationPermissionGranted()) {
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(getActivity(), location -> {
+                        // Got last known location. In some rare situations, this can be null.
+                        if (location != null) {
+                            currentLocation = location;
+                            moveMap(location);
+                        }
+                    });
+        } else {
+            requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+        }
     }
 
     @Override
@@ -101,20 +129,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         mMap.clear();
         mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
         mMap.setOnInfoWindowClickListener(this);
-        getLocationPermission();
-        if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
+        if (currentLocationPermissionGranted()) {
+            getCurrentLocation();
         }
-
-        fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(getActivity(), location -> {
-                    // Got last known location. In some rare situations, this can be null.
-                    if (location != null) {
-                        currentLocation = location;
-                        moveMap(location);
-                    }
-                });
-
     }
 
     private void moveMap(Location location) {
@@ -123,34 +140,28 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
          * adding marker to map
          * move the camera with animation
          */
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,12));
-        mMap.getUiSettings().setZoomControlsEnabled(true);
+        if (mMap != null) {
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 12));
+            mMap.getUiSettings().setZoomControlsEnabled(true);
+        }
     }
 
-    private void getLocationPermission() {
-        if (ContextCompat.checkSelfPermission(getActivity().getApplicationContext(),
-                android.Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            locationPermissionGranted = true;
-        } else {
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
-                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-        }
+    private boolean currentLocationPermissionGranted() {
+        return (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED);
     }
 
     public void onRequestPermissionsResult(int requestCode,
                                            @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
-        locationPermissionGranted = false;
         switch (requestCode) {
             case PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    locationPermissionGranted = true;
+                if (PermissionUtils.verifyPermissions(grantResults)) {
+                    getCurrentLocation();
+                } else {
+                    Toast.makeText(getActivity(), R.string.ask_current_location_map_permission, Toast.LENGTH_LONG).show();
                 }
             }
         }
@@ -208,7 +219,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
                 return image;
             }
 
-            Bitmap b = ((BitmapDrawable)image).getBitmap();
+            Bitmap b = ((BitmapDrawable) image).getBitmap();
 
             int sizeX = Math.round(image.getIntrinsicWidth() * scaleFactor);
             int sizeY = Math.round(image.getIntrinsicHeight() * scaleFactor);
