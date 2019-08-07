@@ -7,10 +7,12 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +39,11 @@ import com.grd.cookit.R;
 import com.grd.cookit.model.ui.UIRecipe;
 import com.grd.cookit.viewModels.RecipeViewModel;
 import com.mikepenz.iconics.view.IconicsButton;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
+
+import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -53,6 +60,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
     @BindView(R.id.current_location_btn)
     IconicsButton currentLocationBtn;
 
+    @BindView(R.id.progress_circular)
+    ProgressBar progressBar;
+
     public MapsFragment() {
         // Required empty public constructor
     }
@@ -68,7 +78,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_maps, container, false);
         ButterKnife.bind(this, v);
-
+        progressBar.setVisibility(View.VISIBLE);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.map);
@@ -103,7 +113,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
         recipeViewModel.getAllRecipes().observe(this, recipes -> {
             mMap.clear();
-
+            progressBar.setVisibility(View.GONE);
             if (currentLocation != null) {
                 LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
                 mMap.addMarker(new MarkerOptions()
@@ -127,7 +137,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
     private void initMap() {
         mMap.clear();
-        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
+        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(progressBar));
         mMap.setOnInfoWindowClickListener(this);
         if (currentLocationPermissionGranted()) {
             getCurrentLocation();
@@ -181,10 +191,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
 
         // These are both viewgroups containing an ImageView with id "badge" and two TextViews with id
         // "title" and "snippet".
-
         private final View mContents;
+        private ProgressBar progressBar;
 
-        CustomInfoWindowAdapter() {
+        CustomInfoWindowAdapter(ProgressBar progressBar) {
+            this.progressBar = progressBar;
             mContents = getLayoutInflater().inflate(R.layout.custom_info_contents, null);
         }
 
@@ -206,29 +217,38 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         private void render(Marker marker, View view) {
             UIRecipe recipe = (UIRecipe) marker.getTag();
 
-            TextView titleUi = ((TextView) view.findViewById(R.id.title));
-            ImageView img = ((ImageView) view.findViewById(R.id.badge));
+            TextView titleUi = view.findViewById(R.id.title);
+            ImageView img = view.findViewById(R.id.badge);
 
-            img.setImageDrawable(scaleImage(recipe.recipeImage, 0.3f));
+            progressBar.setVisibility(View.VISIBLE);
             titleUi.setText(recipe.name);
+
+            recipe.recipeImageRequestCreator.resize(300, 300).into(img, new MarkerCallback(marker, progressBar));
         }
 
-        private Drawable scaleImage(Drawable image, float scaleFactor) {
+        public class MarkerCallback implements Callback {
+            Marker marker;
+            ProgressBar progressBar;
 
-            if ((image == null) || !(image instanceof BitmapDrawable)) {
-                return image;
+            MarkerCallback(Marker marker, ProgressBar progressBar) {
+                this.progressBar = progressBar;
+                this.marker = marker;
             }
 
-            Bitmap b = ((BitmapDrawable) image).getBitmap();
+            @Override
+            public void onError(Exception error) {
+                progressBar.setVisibility(View.GONE);
+                error.printStackTrace();
+            }
 
-            int sizeX = Math.round(image.getIntrinsicWidth() * scaleFactor);
-            int sizeY = Math.round(image.getIntrinsicHeight() * scaleFactor);
-
-            Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 350, 350, false);
-
-            image = new BitmapDrawable(getResources(), bitmapResized);
-
-            return image;
+            @Override
+            public void onSuccess() {
+                progressBar.setVisibility(View.GONE);
+                if (marker != null && marker.isInfoWindowShown()) {
+                    marker.hideInfoWindow();
+                    marker.showInfoWindow();
+                }
+            }
         }
     }
 }

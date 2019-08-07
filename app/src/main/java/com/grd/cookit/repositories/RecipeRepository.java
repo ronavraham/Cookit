@@ -14,6 +14,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.TaskCompletionSource;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
+import com.grd.cookit.R;
 import com.grd.cookit.model.AppLocalDb;
 import com.grd.cookit.model.entities.Recipe;
 import com.grd.cookit.model.entities.User;
@@ -140,6 +141,8 @@ public class RecipeRepository {
             uiRecipe.name = recipe.getName();
             uiRecipe.userGoogleId = recipe.getUserGoogleUid();
             uiRecipe.imageUri = recipe.getImageUri();
+            uiRecipe.recipeImageRequestCreator = Picasso.get().load(recipe.getImageUri()).resize(500,500);
+            uiRecipe.userProfileRequestCreator = Picasso.get().load(user.getProfileUri());
             try {
                 uiRecipe.recipeImage = new BitmapDrawable(Picasso.get().load(recipe.getImageUri()).get());
             } catch (IOException e) {

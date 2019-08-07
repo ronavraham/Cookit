@@ -27,4 +27,14 @@
         app:layout_constraintTop_toTopOf="@+id/map"
         android:backgroundTint="@color/common_google_signin_btn_text_light"/>
 
+    <ProgressBar
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="@+id/map"
+        app:layout_constraintTop_toTopOf="@+id/map"
+        android:layout_marginEnd="8dp"
+        app:layout_goneMarginTop="8dp"
+        android:id="@+id/progress_circular"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

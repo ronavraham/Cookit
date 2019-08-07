@@ -27,6 +27,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.grd.cookit.activities.AuthActivity;
 import com.grd.cookit.activities.MapsActivity;
+import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity implements
                                     NavigationView.OnNavigationItemSelectedListener {
@@ -53,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements
             startActivity(intent);
         } else {
             Log.d(TAG, "YAYYY");
+            Picasso.get().setIndicatorsEnabled(true);
             setupNavigation();
 //            DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
 //            navController = Navigation.findNavController(this,R.id.nav_host_fragment);
