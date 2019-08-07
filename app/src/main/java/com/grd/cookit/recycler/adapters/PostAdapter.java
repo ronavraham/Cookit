@@ -8,6 +8,7 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.grd.cookit.R;
@@ -21,6 +22,7 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import com.grd.cookit.model.ui.UIRecipe;
+import com.squareup.picasso.Callback;
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostHolder> {
 
@@ -65,7 +67,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostHolder> {
     public void onBindViewHolder(@NonNull PostHolder holder, int position) {
         UIRecipe currentPost = this.Posts.get(position);
         holder.postUid = currentPost.uid;
-        holder.Background.setBackgroundDrawable(currentPost.recipeImage);
+        holder.progressBar.setVisibility(View.VISIBLE);
+        currentPost.recipeImageRequestCreator.into(holder.Background, new Callback() {
+            @Override
+            public void onSuccess() {
+                holder.progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
+//        holder.Background.setBackgroundDrawable(currentPost.recipeImage);
         holder.PostText.setText(currentPost.name);
         holder.ProfileImage.setImageDrawable(currentPost.userProfileImage);
         holder.Timestamp.setText(new PrettyTime().format(currentPost.timestamp));
@@ -96,6 +110,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostHolder> {
         public IconicsButton RemoveButton;
         public IconicsButton InfoButton;
         public String postUid;
+        public ProgressBar progressBar;
 
         public PostHolder(View itemView) {
             super(itemView);
@@ -106,6 +121,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostHolder> {
             PostText = itemView.findViewById(R.id.post_text);
             RemoveButton = itemView.findViewById(R.id.remove_post_button);
             InfoButton = itemView.findViewById(R.id.info_post_button);
+            progressBar = itemView.findViewById(R.id.progressBar);
             RemoveButton.setOnClickListener(v -> onItemClickListener.onDeleteClick(v, getAdapterPosition()));
 
             InfoButton.setOnClickListener(v -> onItemClickListener.onInfoClick(v, getAdapterPosition()));
