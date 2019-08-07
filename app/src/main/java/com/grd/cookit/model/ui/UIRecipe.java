@@ -20,6 +20,7 @@ public class UIRecipe {
     public RequestCreator recipeImageRequestCreator;
     public String imageUri;
     public Drawable userProfileImage;
+    public RequestCreator userProfileRequestCreator;
 
     public Date getTimestamp() {
         return timestamp;

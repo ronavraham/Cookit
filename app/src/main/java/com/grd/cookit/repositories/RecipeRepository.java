@@ -142,6 +142,7 @@ public class RecipeRepository {
             uiRecipe.userGoogleId = recipe.getUserGoogleUid();
             uiRecipe.imageUri = recipe.getImageUri();
             uiRecipe.recipeImageRequestCreator = Picasso.get().load(recipe.getImageUri()).resize(500,500);
+            uiRecipe.userProfileRequestCreator = Picasso.get().load(user.getProfileUri());
             try {
                 uiRecipe.recipeImage = new BitmapDrawable(Picasso.get().load(recipe.getImageUri()).get());
             } catch (IOException e) {

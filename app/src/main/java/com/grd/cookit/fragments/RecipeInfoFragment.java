@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,8 @@ import com.grd.cookit.R;
 import com.grd.cookit.model.ui.UIRecipe;
 import com.grd.cookit.viewModels.RecipeViewModel;
 import com.mikepenz.iconics.view.IconicsButton;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -55,6 +58,9 @@ public class RecipeInfoFragment extends Fragment {
     @BindView(R.id.remove_recipe_button)
     IconicsButton removeBtn;
 
+    @BindView(R.id.progress_circular)
+    ProgressBar progressBar;
+
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
@@ -67,13 +73,23 @@ public class RecipeInfoFragment extends Fragment {
         View v = inflater.inflate(R.layout.recipe_info_fragment, container, false);
 
         ButterKnife.bind(this, v);
-
         recipeViewModel.getselectedRecipe().observe(this,(selectedRecipe)->{
             recipe = selectedRecipe;
             userName.setText(selectedRecipe.userName);
-            userImage.setBackgroundDrawable(selectedRecipe.userProfileImage);
+            selectedRecipe.userProfileRequestCreator.into(userImage);
             timestamp.setText(new PrettyTime().format(selectedRecipe.timestamp));
-            imageRecipe.setBackgroundDrawable(selectedRecipe.recipeImage);
+            progressBar.setVisibility(View.VISIBLE);
+            selectedRecipe.recipeImageRequestCreator.into(imageRecipe, new Callback() {
+                @Override
+                public void onSuccess() {
+                    progressBar.setVisibility(View.GONE);
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    progressBar.setVisibility(View.GONE);
+                }
+            });
             recipeDesc.setText(selectedRecipe.description);
             recipeName.setText(selectedRecipe.name);
             if(!selectedRecipe.userGoogleId.equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){

@@ -37,6 +37,7 @@ import com.grd.cookit.R;
 import com.grd.cookit.model.ui.UIRecipe;
 import com.grd.cookit.repositories.RecipeRepository;
 import com.grd.cookit.viewModels.RecipeViewModel;
+import com.squareup.picasso.Callback;
 
 import java.io.File;
 import java.io.IOException;
@@ -122,7 +123,18 @@ public class AddEditRecipeFragment extends Fragment {
             toolbar.setTitle(R.string.edit_recipe_title);
             recipeViewModel.getselectedRecipe().observe(this, (recipe) -> {
                 currRecipe = recipe;
-                imageView.setBackgroundDrawable(recipe.recipeImage);
+                progressBar.setVisibility(View.VISIBLE);
+                recipe.recipeImageRequestCreator.into(imageView, new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        progressBar.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        progressBar.setVisibility(View.GONE);
+                    }
+                });
                 editText.setText(recipe.name);
                 descriptionText.setText(recipe.description);
             });
