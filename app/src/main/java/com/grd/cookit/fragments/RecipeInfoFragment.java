@@ -118,7 +118,6 @@ public class RecipeInfoFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        recipeViewModel.selectRecipe(null);
         recipeViewModel.getselectedRecipe().removeObservers(this);
         recipeViewModel = null;
     }
