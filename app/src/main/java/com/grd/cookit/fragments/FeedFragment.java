@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.grd.cookit.MainActivity;
 import com.grd.cookit.R;
 import com.grd.cookit.model.ui.UIRecipe;
 import com.grd.cookit.recycler.adapters.PostAdapter;
@@ -59,6 +60,10 @@ public class FeedFragment extends Fragment {
         rv.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(getContext());
         rv.setLayoutManager(layoutManager);
+        MainActivity activity = ((MainActivity)getActivity());
+        if (activity != null) {
+            activity.setupNavigation();
+        }
         postAdapter = new PostAdapter(getContext(),
                 currRecipes,
                 FirebaseAuth.getInstance().getCurrentUser().getUid(),

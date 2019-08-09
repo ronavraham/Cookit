@@ -90,10 +90,12 @@
         android:id="@+id/mainFragment"
         android:name="com.grd.cookit.fragments.MainFragment"
         android:label="fragment_main"
-        tools:layout="@layout/fragment_main" >
+        tools:layout="@layout/fragment_main">
         <action
             android:id="@+id/action_mainFragment_to_feedFragment"
-            app:destination="@id/feedFragment" />
+            app:destination="@id/feedFragment"
+            app:popUpTo="@+id/mainFragment"
+            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_mainFragment_to_authFragment"
             app:destination="@id/authFragment" />
@@ -105,6 +107,8 @@
         tools:layout="@layout/fragment_auth" >
         <action
             android:id="@+id/action_authFragment_to_feedFragment"
-            app:destination="@id/feedFragment" />
+            app:destination="@id/feedFragment"
+            app:popUpTo="@+id/mainFragment"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

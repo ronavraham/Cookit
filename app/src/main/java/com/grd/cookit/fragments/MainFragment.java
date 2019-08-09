@@ -41,11 +41,6 @@ public class MainFragment extends Fragment {
 
 //            setupNavigation();
             if (navController.getCurrentDestination().getId() != R.id.feedFragment) {
-                MainActivity activity = ((MainActivity)getActivity());
-                if (activity != null) {
-                    activity.setupNavigation();
-                }
-
                 navController.navigate(R.id.action_mainFragment_to_feedFragment);
             }
         }

@@ -19,7 +19,7 @@ import com.google.android.material.navigation.NavigationView;
 import com.grd.cookit.fragments.MainFragment;
 
 public class MainActivity extends AppCompatActivity implements
-                                    NavigationView.OnNavigationItemSelectedListener {
+        NavigationView.OnNavigationItemSelectedListener {
 
     private final static String TAG = "MAIN_ACTIVITY";
 
@@ -28,11 +28,13 @@ public class MainActivity extends AppCompatActivity implements
     private Toolbar toolbar;
     DrawerLayout drawerLayout;
     NavigationView navigationView;
+    private boolean actionBarAlreadySet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        this.actionBarAlreadySet = false;
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -47,30 +49,36 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public void setupNavigation() {
+        if (!actionBarAlreadySet) {
+            actionBarAlreadySet = true;
+            toolbar = findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+            drawerLayout = findViewById(R.id.drawer_layout);
 
-        drawerLayout = findViewById(R.id.drawer_layout);
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
 
-        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            navigationView = findViewById(R.id.nav_view);
 
-        navigationView = findViewById(R.id.nav_view);
+            navController = Navigation.findNavController(this, R.id.nav_host_fragment);
 
-        navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+            NavigationUI.setupActionBarWithNavController(this, navController, drawerLayout);
 
-        NavigationUI.setupActionBarWithNavController(this, navController, drawerLayout);
+            AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(R.id.feedFragment).setDrawerLayout(drawerLayout).build();
 
-        NavigationUI.setupWithNavController(navigationView, navController);
+            NavigationUI.setupWithNavController(toolbar, navController, appBarConfiguration);
+//        NavigationUI.setupWithNavController(navigationView, navController);
 
-        navigationView.setNavigationItemSelectedListener((this::onNavigationItemSelected));
+            navigationView.setNavigationItemSelectedListener((this::onNavigationItemSelected));
+        }
+
     }
 
     @Override
     public boolean onSupportNavigateUp() {
-        return NavigationUI.navigateUp(navController,drawerLayout);
+        return NavigationUI.navigateUp(navController, drawerLayout);
 //        return NavigationUI.navigateUp(drawerLayout, Navigation.findNavController(this, R.id.nav_host_fragment));
     }
 
@@ -112,7 +120,6 @@ public class MainActivity extends AppCompatActivity implements
 //                finish();
 //                startActivity(intent);
 //                break;
-
 
 
         return true;
