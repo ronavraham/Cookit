@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity implements
         fragmentTransaction.commit();
     }
 
-    private void setupNavigation() {
+    public void setupNavigation() {
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity implements
         NavigationUI.setupWithNavController(navigationView, navController);
 
         navigationView.setNavigationItemSelectedListener((this::onNavigationItemSelected));
-
     }
 
     @Override

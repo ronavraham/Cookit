@@ -10,6 +10,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.grd.cookit.MainActivity;
 import com.grd.cookit.R;
 
 public class MainFragment extends Fragment {
@@ -33,11 +34,20 @@ public class MainFragment extends Fragment {
 
         NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
         if (auth.getCurrentUser() == null) {
-            navController.navigate(R.id.action_mainFragment_to_authFragment);
+            if (navController.getCurrentDestination().getId() != R.id.authFragment) {
+                navController.navigate(R.id.action_mainFragment_to_authFragment);
+            }
         } else {
-            navController.navigate(R.id.action_mainFragment_to_feedFragment);
-//            Picasso.get().setIndicatorsEnabled(true);
+
 //            setupNavigation();
+            if (navController.getCurrentDestination().getId() != R.id.feedFragment) {
+                MainActivity activity = ((MainActivity)getActivity());
+                if (activity != null) {
+                    activity.setupNavigation();
+                }
+
+                navController.navigate(R.id.action_mainFragment_to_feedFragment);
+            }
         }
     }
 }

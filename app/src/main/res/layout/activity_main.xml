@@ -15,6 +15,13 @@
     tools:openDrawer="start"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <FrameLayout
+        android:id="@+id/auth_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"></FrameLayout>
+
     <!-- Layout to contain contents of main body of screen (drawer will slide over this) -->
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -60,12 +67,5 @@
         app:menu="@menu/menu_drawer">
 
     </com.google.android.material.navigation.NavigationView>
-
-    <FrameLayout
-        android:id="@+id/auth_content"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"></FrameLayout>
 
 </androidx.drawerlayout.widget.DrawerLayout>

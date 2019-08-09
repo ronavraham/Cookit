@@ -13,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -27,7 +29,6 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.grd.cookit.MainActivity;
 import com.grd.cookit.R;
 import com.grd.cookit.model.entities.User;
 import com.grd.cookit.viewModels.UserViewModel;
@@ -75,8 +76,8 @@ public class AuthFragment extends Fragment {
 
                 userViewModel.saveUser(newUser);
 
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                startActivity(intent);
+                NavController navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+                navController.navigate(R.id.action_authFragment_to_feedFragment);
             }
         }, getActivity());
     }
