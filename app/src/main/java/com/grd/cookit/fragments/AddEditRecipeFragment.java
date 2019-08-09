@@ -22,7 +22,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
@@ -38,7 +37,6 @@ import com.grd.cookit.model.ui.UIRecipe;
 import com.grd.cookit.repositories.RecipeRepository;
 import com.grd.cookit.viewModels.RecipeViewModel;
 import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
@@ -85,6 +83,7 @@ public class AddEditRecipeFragment extends Fragment {
 
     public AddEditRecipeFragment() {
         recipeViewModel = null;
+        tempFile = null;
     }
 
     @Override
@@ -118,12 +117,14 @@ public class AddEditRecipeFragment extends Fragment {
         if (type.equals("add")) {
             toolbar.setTitle(R.string.add_recipe_title);
 
-            btnPublish.setOnClickListener((vi) -> publishRecipe());
+            btnPublish.setOnClickListener((vi) -> {
+                if (validateNameAndDesc() && validatePicture()) publishRecipe();
+            });
 
         } else {
             toolbar.setTitle(R.string.edit_recipe_title);
             recipeViewModel.getselectedRecipe().observe(this, (recipe) -> {
-                if(recipe == null) return;
+                if (recipe == null) return;
                 currRecipe = recipe;
                 progressBar.setVisibility(View.VISIBLE);
                 recipe.recipeImageRequestCreator.into(imageView, new Callback() {
@@ -141,11 +142,33 @@ public class AddEditRecipeFragment extends Fragment {
                 descriptionText.setText(recipe.description);
             });
 
-            btnPublish.setOnClickListener(vi -> updateRecipe());
+            btnPublish.setOnClickListener(vi -> {
+                if (validateNameAndDesc()) updateRecipe();
+            });
         }
 
         btnTakePicture.setOnClickListener((vi) -> takePicture());
         return v;
+    }
+
+    public boolean validateNameAndDesc() {
+        if (editText.getText().toString().trim().equals("")) {
+            Toast.makeText(getActivity(), R.string.invalid_recipe_name, Toast.LENGTH_LONG).show();
+            return false;
+        }
+        if (descriptionText.getText().toString().trim().equals("")) {
+            Toast.makeText(getActivity(), R.string.invalid_recipe_description, Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validatePicture(){
+        if (tempFile == null || tempFile.toString().trim().equals("")) {
+            Toast.makeText(getActivity(), R.string.invalid_recipe_picture, Toast.LENGTH_LONG).show();
+            return false;
+        }
+        return true;
     }
 
     public void takePicture() {
@@ -153,7 +176,7 @@ public class AddEditRecipeFragment extends Fragment {
         if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                        == PackageManager.PERMISSION_GRANTED&&
+                        == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         == PackageManager.PERMISSION_GRANTED) {
             Log.d(TAG, "takePicture: start camera activity");
@@ -179,17 +202,17 @@ public class AddEditRecipeFragment extends Fragment {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         // in case asked for camera and storage
         if (requestCode == REQUEST_CAMERA_AND_STORAGE) {
-            if(PermissionUtils.verifyPermissions(grantResults)){
+            if (PermissionUtils.verifyPermissions(grantResults)) {
                 // in case all permission granted
                 takePicture();
-            }else{
-                Toast.makeText(getActivity(),R.string.ask_camera_and_storage_permission,Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getActivity(), R.string.ask_camera_and_storage_permission, Toast.LENGTH_LONG).show();
             }
         } else if (requestCode == REQUEST_CURRENT_LOCATION) {
-            if(PermissionUtils.verifyPermissions(grantResults)){
+            if (PermissionUtils.verifyPermissions(grantResults)) {
                 publishRecipe();
-            }else{
-                Toast.makeText(getActivity(),R.string.ask_location_permission,Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getActivity(), R.string.ask_location_permission, Toast.LENGTH_LONG).show();
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -200,6 +223,8 @@ public class AddEditRecipeFragment extends Fragment {
         String recipeName = editText.getText().toString();
         String recipeDesc = descriptionText.getText().toString();
         progressBar.setVisibility(View.VISIBLE);
+        btnPublish.setEnabled(false);
+        btnTakePicture.setEnabled(false);
         recipeViewModel.updateRecipe(currRecipe, tempFile, recipeName, recipeDesc, (e) -> {
                     Toast.makeText(getActivity(), "succeed", Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(getView()).popBackStack();
@@ -232,9 +257,11 @@ public class AddEditRecipeFragment extends Fragment {
     }
 
     public void publishRecipe() {
-        if(ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED){
-        progressBar.setVisibility(View.VISIBLE);
+        if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            progressBar.setVisibility(View.VISIBLE);
+            btnPublish.setEnabled(false);
+            btnTakePicture.setEnabled(false);
             getPhoneLocation((location) -> {
                 RecipeRepository.saveRecipe(editText.getText().toString(), descriptionText.getText().toString(), tempFile, location, (e) -> {
                     progressBar.setVisibility(View.INVISIBLE);
@@ -246,7 +273,7 @@ public class AddEditRecipeFragment extends Fragment {
                     Toast.makeText(getActivity(), R.string.general_error_message, Toast.LENGTH_SHORT).show();
                 });
             });
-        }else{
+        } else {
             requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_CURRENT_LOCATION);
         }

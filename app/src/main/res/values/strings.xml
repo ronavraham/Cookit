@@ -33,4 +33,7 @@
     <string name="ask_camera_and_storage_permission">To take picture the app need permission for camera and stoarge</string>
     <string name="ask_location_permission">To publish the recipe, the app need your phone location</string>
     <string name="ask_current_location_map_permission">The app need your permission to display your current location</string>
+    <string name="invalid_recipe_name">Recipe must have name</string>
+    <string name="invalid_recipe_description">Recipe must have description</string>
+    <string name="invalid_recipe_picture">Recipe must have picture</string>
 </resources>
