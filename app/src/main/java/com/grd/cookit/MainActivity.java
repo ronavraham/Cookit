@@ -1,33 +1,22 @@
 package com.grd.cookit;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.google.android.gms.common.SignInButton;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.grd.cookit.activities.AuthActivity;
-import com.grd.cookit.activities.MapsActivity;
-import com.squareup.picasso.Picasso;
+import com.grd.cookit.fragments.MainFragment;
 
 public class MainActivity extends AppCompatActivity implements
                                     NavigationView.OnNavigationItemSelectedListener {
@@ -47,25 +36,14 @@ public class MainActivity extends AppCompatActivity implements
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction =
+                fragmentManager.beginTransaction();
 
-        if (auth.getCurrentUser() == null) {
-            Intent intent = new Intent(this, AuthActivity.class);
-            startActivity(intent);
-        } else {
-            Log.d(TAG, "YAYYY");
-            Picasso.get().setIndicatorsEnabled(true);
-            setupNavigation();
-//            DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
-//            navController = Navigation.findNavController(this,R.id.nav_host_fragment);
-//            appBarConfiguration =
-//                    new AppBarConfiguration.Builder(navController.getGraph()).setDrawerLayout(drawerLayout).build();
-//            NavigationView navView = findViewById(R.id.nav_view);
-//            NavigationUI.setupWithNavController(navView, navController);
-//            NavigationUI.setupActionBarWithNavController(this,navController);
-//            NavigationUI.setupWithNavController(toolbar,navController);
-//            NavigationUI.setupActionBarWithNavController(this,navController,appBarConfiguration);
-        }
+        MainFragment mainFragment = new MainFragment();
+
+        fragmentTransaction.add(R.id.auth_content, mainFragment);
+        fragmentTransaction.commit();
     }
 
     private void setupNavigation() {

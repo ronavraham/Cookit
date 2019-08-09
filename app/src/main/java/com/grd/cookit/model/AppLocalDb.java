@@ -8,5 +8,6 @@ public class AppLocalDb {
     static public AppLocalDbRepository db =
             Room.databaseBuilder(Cookit.context,
                     AppLocalDbRepository.class, "cookitDb.db")
+                    .allowMainThreadQueries()
                     .fallbackToDestructiveMigration().build();
 }
