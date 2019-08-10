@@ -22,10 +22,10 @@
             android:icon="@drawable/ic_add_black_24dp"/>
 
 
-        <!--<item-->
-            <!--android:id="@+id/navigate_to_logout"-->
-            <!--android:title="@string/drawer_logout"-->
-            <!--android:icon="@drawable/ic_exit_to_app_black_24dp"/>-->
+        <item
+            android:id="@+id/navigate_to_logout"
+            android:title="@string/drawer_logout"
+            android:icon="@drawable/ic_exit_to_app_black_24dp"/>
 
     </group>
 

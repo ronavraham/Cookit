@@ -194,7 +194,9 @@ public class RecipeRepository {
             List<Recipe> postsFromDb = AppLocalDb.db.recipesDao().getAllRecipes();
             List<User> usersFromDb = AppLocalDb.db.usersDao().getAllUsers();
 
-            recipes.postValue(makeRecipesForList(postsFromDb, usersFromDb));
+            if(postsFromDb.size() != 0) {
+                recipes.postValue(makeRecipesForList(postsFromDb, usersFromDb));
+            }
 
             return null;
         }

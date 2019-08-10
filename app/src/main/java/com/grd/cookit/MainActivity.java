@@ -2,6 +2,7 @@ package com.grd.cookit;
 
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.content.Intent;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import com.google.firebase.auth.FirebaseAuth;
 
 import com.google.android.material.navigation.NavigationView;
 import com.grd.cookit.fragments.MainFragment;
@@ -112,15 +114,15 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.navigate_to_user_profile:
                 navController.navigate(R.id.action_feedFragment_to_profileFragment);
                 break;
-        }
-//            case R.id.navigate_to_logout:
-//                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-//                firebaseAuth.signOut();
-//                Intent intent = getIntent();
-//                finish();
-//                startActivity(intent);
-//                break;
 
+            case R.id.navigate_to_logout:
+                FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+                firebaseAuth.signOut();
+                Intent intent = getIntent();
+                finish();
+                startActivity(intent);
+                break;
+        }
 
         return true;
 

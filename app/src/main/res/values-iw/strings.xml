@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Cookit</string>
     <string name="recipe_name">שם המתכון</string>
-    <string name="recipe_description">תיאור המתכון</string>
+    <string name="recipe_description">תיאור המתכון:</string>
     <string name="take_picture">צלם תמונה</string>
     <string name="publish">פרסם</string>
     <string name="add_recipe_title">הוסף מתכון חדש</string>
