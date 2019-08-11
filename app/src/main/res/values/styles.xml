@@ -10,6 +10,7 @@
         <item name="windowActionBar">false</item>
         <item name="android:windowActionModeOverlay">true</item>
         <item name="android:actionBarStyle">@style/ActionBarStyle</item>
+        <item name="actionBarTheme">@color/primary</item>
     </style>
 
     <style name="ActionBarStyle" parent="MaterialDrawerTheme.Light.DarkToolbar">
