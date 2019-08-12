@@ -141,6 +141,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         mMap.setOnInfoWindowClickListener(this);
         if (currentLocationPermissionGranted()) {
             getCurrentLocation();
+        }else{
+            requestPermissions(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         }
     }
 
