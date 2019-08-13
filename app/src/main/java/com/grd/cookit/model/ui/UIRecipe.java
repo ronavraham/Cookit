@@ -16,10 +16,8 @@ public class UIRecipe {
     public double longitude;
     public double latitude;
     public Date timestamp;
-    public Drawable recipeImage;
     public RequestCreator recipeImageRequestCreator;
     public String imageUri;
-    public Drawable userProfileImage;
     public RequestCreator userProfileRequestCreator;
 
     public Date getTimestamp() {

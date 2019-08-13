@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Pair;
 
+import androidx.annotation.WorkerThread;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
@@ -44,10 +45,8 @@ public class RecipeRepository {
     }
 
     public LiveData<List<UIRecipe>> getAllRecipes() {
-        synchronized (this) {
-            AsyncTask task = new GetAllRecipesTask();
-            task.execute(new String[]{});
-        }
+        AsyncTask task = new GetAllRecipesTask();
+        task.execute(new String[]{});
 
         return this.recipes;
     }
@@ -141,19 +140,8 @@ public class RecipeRepository {
             uiRecipe.name = recipe.getName();
             uiRecipe.userGoogleId = recipe.getUserGoogleUid();
             uiRecipe.imageUri = recipe.getImageUri();
-            uiRecipe.recipeImageRequestCreator = Picasso.get().load(recipe.getImageUri()).resize(500,500);
+            uiRecipe.recipeImageRequestCreator = Picasso.get().load(recipe.getImageUri()).resize(500, 500);
             uiRecipe.userProfileRequestCreator = Picasso.get().load(user.getProfileUri());
-            try {
-                uiRecipe.recipeImage = new BitmapDrawable(Picasso.get().load(recipe.getImageUri()).get());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                uiRecipe.userProfileImage = new BitmapDrawable(Picasso.get().load(user.getProfileUri()).get());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
 
             finalResult.add(uiRecipe);
         });
@@ -168,6 +156,7 @@ public class RecipeRepository {
         return makeRecipesForList(posts, userList);
     }
 
+    @WorkerThread
     private class GetAllRecipesTask extends AsyncTask<String, String, List<UIRecipe>> {
 
         @Override
@@ -194,8 +183,9 @@ public class RecipeRepository {
             List<Recipe> postsFromDb = AppLocalDb.db.recipesDao().getAllRecipes();
             List<User> usersFromDb = AppLocalDb.db.usersDao().getAllUsers();
 
-            if(postsFromDb.size() != 0) {
-                recipes.postValue(makeRecipesForList(postsFromDb, usersFromDb));
+            if (postsFromDb.size() != 0) {
+                List<UIRecipe> a = makeRecipesForList(postsFromDb, usersFromDb);
+                recipes.postValue(a);
             }
 
             return null;

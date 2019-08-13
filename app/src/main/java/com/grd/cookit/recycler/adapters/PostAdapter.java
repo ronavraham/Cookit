@@ -79,9 +79,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostHolder> {
 
             }
         });
-//        holder.Background.setBackgroundDrawable(currentPost.recipeImage);
         holder.PostText.setText(currentPost.name);
-        holder.ProfileImage.setImageDrawable(currentPost.userProfileImage);
+        currentPost.userProfileRequestCreator.into(holder.ProfileImage);
         holder.Timestamp.setText(new PrettyTime().format(currentPost.timestamp));
         holder.UserName.setText(currentPost.userName);
         if(!currentPost.userGoogleId.equals(this.userId)){
