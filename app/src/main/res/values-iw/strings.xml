@@ -24,4 +24,5 @@
     <string name="invalid_recipe_name">למתכון חייב להיות שם</string>
     <string name="invalid_recipe_description">למתכון חייב להיות תיאור</string>
     <string name="invalid_recipe_picture">למתכון חייב להיות תמונה</string>
+    <string name="no_data_available">לא נמצאו מתכונים</string>
 </resources>

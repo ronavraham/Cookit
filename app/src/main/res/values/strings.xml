@@ -36,4 +36,5 @@
     <string name="invalid_recipe_name">Recipe must have name</string>
     <string name="invalid_recipe_description">Recipe must have description</string>
     <string name="invalid_recipe_picture">Recipe must have picture</string>
+    <string name="no_data_available">No Recipes to show</string>
 </resources>

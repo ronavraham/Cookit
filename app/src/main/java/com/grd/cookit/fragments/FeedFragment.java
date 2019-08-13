@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
@@ -33,10 +34,14 @@ public class FeedFragment extends Fragment {
     @BindView(R.id.posts_recycler)
     RecyclerView recyclerView;
 
+    @BindView(R.id.empty_view)
+    TextView emptyView;
+
     private LinearLayoutManager layoutManager;
     private RecipeViewModel recipeViewModel;
     private PostAdapter postAdapter;
     private List<UIRecipe> currRecipes;
+
 
     public FeedFragment() {
         currRecipes = null;
@@ -97,6 +102,14 @@ public class FeedFragment extends Fragment {
     private void bindAdapterToLivedata() {
         turnOnProgressBar();
         recipeViewModel.getAllRecipes().observe(this, (posts) -> {
+            if (posts.isEmpty()) {
+                recyclerView.setVisibility(View.GONE);
+                emptyView.setVisibility(View.VISIBLE);
+            }
+            else {
+                recyclerView.setVisibility(View.VISIBLE);
+                emptyView.setVisibility(View.GONE);
+            }
             postAdapter.Posts = posts;
             currRecipes = posts;
             postAdapter.notifyDataSetChanged();

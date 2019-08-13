@@ -2,12 +2,15 @@ package com.grd.cookit.fragments;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.navigation.Navigation;
@@ -16,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
+import com.grd.cookit.MainActivity;
 import com.grd.cookit.R;
 import com.grd.cookit.model.ui.UIRecipe;
 import com.grd.cookit.recycler.adapters.PostAdapter;
@@ -25,8 +29,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
-// import com.grd.cookit.activities.A;
 
 public class ProfileFragment extends Fragment {
 
@@ -38,6 +40,9 @@ public class ProfileFragment extends Fragment {
 
     @BindView(R.id.posts_recycler)
     RecyclerView recyclerView;
+
+    @BindView(R.id.empty_view)
+    TextView emptyView;
 
     private RecipeViewModel recipeViewModel;
     private LinearLayoutManager layoutManager;
@@ -75,7 +80,9 @@ public class ProfileFragment extends Fragment {
                 new PostAdapter.OnItemClickListener() {
                     @Override
                     public void onDeleteClick(View v, int position) {
-                        recipeViewModel.deletePost(currRecipes.get(position).uid);
+                        AlertDialog diaBox = AskOption(position);
+                        diaBox.show();
+                        //recipeViewModel.deletePost(currRecipes.get(position).uid);
                     }
 
                     @Override
@@ -124,6 +131,14 @@ public class ProfileFragment extends Fragment {
     }
 
     private void updatePosts(List<UIRecipe> posts) {
+        if (posts.isEmpty()) {
+            recyclerView.setVisibility(View.GONE);
+            emptyView.setVisibility(View.VISIBLE);
+        }
+        else {
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyView.setVisibility(View.GONE);
+        }
         postAdapter.Posts = posts;
         currRecipes = posts;
         postAdapter.notifyDataSetChanged();
@@ -137,5 +152,36 @@ public class ProfileFragment extends Fragment {
         recipeViewModel.profileBusy.removeObservers(this);
         recipeViewModel.recipesForProfile.removeObservers(this);
         isBinded = false;
+    }
+
+    private AlertDialog AskOption(int position)
+    {
+        AlertDialog myQuittingDialogBox =new AlertDialog.Builder(getActivity())
+                //set message, title, and icon
+                .setTitle("Delete")
+                .setMessage("Do you want to Delete")
+                .setIcon(R.drawable.ic_warning)
+
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        recipeViewModel.deletePost(currRecipes.get(position).uid);
+                        dialog.dismiss();
+                    }
+
+                })
+
+
+
+                .setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.dismiss();
+
+                    }
+                })
+                .create();
+        return myQuittingDialogBox;
+
     }
 }
