@@ -10,6 +10,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.grd.cookit.model.ui.UIRecipe;
 import com.grd.cookit.repositories.RecipeRepository;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.List;

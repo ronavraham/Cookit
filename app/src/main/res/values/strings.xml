@@ -15,7 +15,7 @@
     <string name="title_activity_maps">Map</string>
     <string name="home_fragment_navigate_to_add_edit_recipe">add recipe</string>
     <string name="recipe_name">recipe name</string>
-    <string name="recipe_description">recipe description:</string>
+    <string name="recipe_description">recipe description</string>
     <string name="take_picture">take picture</string>
     <string name="publish">publish</string>
     <string name="add_recipe_title">add new recipe</string>
