@@ -76,7 +76,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.PostHolder> {
 
             @Override
             public void onError(Exception e) {
-
+                holder.progressBar.setVisibility(View.GONE);
             }
         });
         holder.PostText.setText(currentPost.name);
