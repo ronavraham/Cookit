@@ -90,7 +90,6 @@ public class AddEditRecipeFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         recipeViewModel = ViewModelProviders.of(getActivity()).get(RecipeViewModel.class);
-        ;
     }
 
     @Override

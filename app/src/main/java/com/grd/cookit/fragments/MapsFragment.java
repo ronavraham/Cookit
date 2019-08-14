@@ -114,14 +114,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Google
         recipeViewModel.getAllRecipes().observe(this, recipes -> {
             mMap.clear();
             progressBar.setVisibility(View.GONE);
-            if (currentLocation != null) {
-                LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-                mMap.addMarker(new MarkerOptions()
-                        .position(latLng)
-                        .draggable(true)
-                        .title("Current Location"))
-                        .setIcon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-            }
 
             recipes.forEach(recipe -> {
                 LatLng latLng = new LatLng(recipe.latitude, recipe.longitude);
