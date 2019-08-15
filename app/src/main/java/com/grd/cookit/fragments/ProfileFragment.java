@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
-import com.grd.cookit.MainActivity;
 import com.grd.cookit.R;
 import com.grd.cookit.model.ui.UIRecipe;
 import com.grd.cookit.recycler.adapters.PostAdapter;
@@ -80,9 +79,7 @@ public class ProfileFragment extends Fragment {
                 new PostAdapter.OnItemClickListener() {
                     @Override
                     public void onDeleteClick(View v, int position) {
-                        AlertDialog diaBox = AskOption(position);
-                        diaBox.show();
-                        //recipeViewModel.deletePost(currRecipes.get(position).uid);
+                        recipeViewModel.deletePost(currRecipes.get(position).uid);
                     }
 
                     @Override
